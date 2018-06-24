@@ -28,7 +28,7 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private int playerNumber = 1;
+    private int playerNumber;
     private Button btnAddMother, btnLaunch;
     public static Boolean state1 = false, cosa = true;
     private SpaceShip mother;
@@ -41,13 +41,11 @@ public class Window extends Application {
     private Runnable launch = new Runnable() {
         @Override
         public void run() {
-            
-            
             if (playerNumber == 1) {
                 missile = new Missile(mother.getX() * size, mother.getY() * size, 450, playerNumber, size);
                 portal = new Portal(420, mother.getY() * size, 1);
             } else {
-                missile = new Missile(mother.getX() * size+size/2-5, mother.getY() * size, 0, playerNumber, size);
+                missile = new Missile(mother.getX() * size + size / 2 - 5, mother.getY() * size, 0, playerNumber, size);
                 portal = new Portal(-5, mother.getY() * size, 2);
             }
             missile.start();
@@ -58,8 +56,8 @@ public class Window extends Application {
                     portal.start();
                 }
                 System.err.println(missile.getxI());
-                if ((missile.getxI() == portal.getX() && playerNumber==1)||(missile.getxI() == portal.getX()+5 && playerNumber==2)) {
-                    
+                if ((missile.getxI() == portal.getX() && playerNumber == 1) || (missile.getxI() == portal.getX() + 5 && playerNumber == 2)) {
+
                     portal.setState(1);
                     portal.setEnd(true);
                 }
@@ -183,8 +181,9 @@ public class Window extends Application {
         btnLaunch.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                cosa = true;
-                new Thread(launch).start();
+//                cosa = true;
+//                new Thread(launch).start();
+                getMyNumber();
             }
         });
         this.hBox.getChildren().add(canvasPlayer1);
@@ -248,6 +247,7 @@ public class Window extends Application {
 
     public static void main(String[] args) {
         launch(args);
+
     } // main
 
     public void drawGrid(GraphicsContext gcM) {
@@ -290,6 +290,15 @@ public class Window extends Application {
                 portal.draw(gc);
             }
         }
+    }
+
+    public void getMyNumber() {
+        MyClient client = new MyClient();
+        client.setAction("log");
+        client.setNamePlayer("Yer");
+        client.start();
+        this.playerNumber = client.getNumberPlayer();
+        System.out.println("Main " + this.playerNumber);
     }
 
 } // end class
