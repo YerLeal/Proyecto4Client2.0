@@ -13,7 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -37,22 +36,35 @@ public class Window extends Application {
     private Portal portal;
     private int size = 150;
     private ArrayList<SpaceShip> spaceShips;
+    private int x = 2, y = 2, mCont = 0, mP = 0;
 
     private Runnable launch = new Runnable() {
         @Override
         public void run() {
-            missile = new Missile(mother.getX() * size, mother.getY() * size, 450, 0, 1);
-            portal = new Portal(420, mother.getY() * size, 1);
+            
+            
+            if (playerNumber == 1) {
+                missile = new Missile(mother.getX() * size, mother.getY() * size, 450, playerNumber, size);
+                portal = new Portal(420, mother.getY() * size, 1);
+            } else {
+                missile = new Missile(mother.getX() * size+size/2-5, mother.getY() * size, 0, playerNumber, size);
+                portal = new Portal(-5, mother.getY() * size, 2);
+            }
             missile.start();
             while (cosa) {
-                if (portal.getX() - missile.getxI() < 100 && missile.isAlive() == true && portal.isAlive() == false) {
+                if (portal.getX() - missile.getxI() < 100 && playerNumber == 1 && missile.isAlive() == true && portal.isAlive() == false) {
+                    portal.start();
+                } else if ((portal.getX() + missile.getxI() < 100 && playerNumber == 2) && missile.isAlive() == true && portal.isAlive() == false) {
                     portal.start();
                 }
-                if (missile.getxI() == portal.getX()) {
+                System.err.println(missile.getxI());
+                if ((missile.getxI() == portal.getX() && playerNumber==1)||(missile.getxI() == portal.getX()+5 && playerNumber==2)) {
+                    
                     portal.setState(1);
                     portal.setEnd(true);
                 }
-                draw();
+                auxDraw();
+
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ex) {
@@ -66,24 +78,34 @@ public class Window extends Application {
         @Override
         public void run() {
             cosa = true;
-            portal = portal = new Portal(420, mother.getY() * size, 1);
+            if (playerNumber == 1) {
+                portal = portal = new Portal(420, y * size, playerNumber);
+            } else {
+                portal = portal = new Portal(0, y * size, playerNumber);
+            }
             portal.start();
-            missile = new Missile(430, mother.getY() * size, mother.getX() * size, mother.getY() * size, 2);
+            if (playerNumber == 1) {
+                missile = new Missile(430, y * size, x * size, 2, size);
+            } else {
+                missile = new Missile(0, y * size, x * size, 1, size);
+            }
 
             missile.setEnd(true);
             while (cosa) {
+
                 if (portal.getiCont() == 3 && missile.isAlive() == false) {
                     missile.start();
                 }
-                if (portal.getX() - missile.getxI() > 50) {
+                if ((portal.getX() - missile.getxI() > 50 && playerNumber == 1) || (portal.getX() + missile.getxI() > 50 && playerNumber == 2)) {
                     portal.setState(1);
                 }
-
-                draw();
+                auxDraw();
                 try {
                     Thread.sleep(50);
+
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Window.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -97,10 +119,12 @@ public class Window extends Application {
                         spaceShips.get(i).start();
                         while (spaceShips.get(i).getiCont() < 9) {
                             try {
-                                draw();
+                                auxDraw();
                                 Thread.sleep(50);
+
                             } catch (InterruptedException ex) {
-                                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(Window.class
+                                        .getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                         spaceShips.remove(i);
@@ -109,10 +133,18 @@ public class Window extends Application {
                 }
             }
 
-            draw();
+            auxDraw();
         }
 
     };
+
+    public void auxDraw() {
+        if (playerNumber == 1) {
+            draw(gc1);
+        } else {
+            draw(gc2);
+        }
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -137,6 +169,7 @@ public class Window extends Application {
         this.canvasPlayer1 = new Canvas(450, 450);
         this.canvasPlayer2 = new Canvas(450, 450);
         canvasPlayer1.setOnMouseClicked(evento);
+        canvasPlayer2.setOnMouseClicked(evento);
         gc1 = canvasPlayer1.getGraphicsContext2D();
         gc2 = canvasPlayer2.getGraphicsContext2D();
         drawGrid(gc1);
@@ -151,7 +184,7 @@ public class Window extends Application {
             @Override
             public void handle(ActionEvent event) {
                 cosa = true;
-                new Thread(recieve).start();
+                new Thread(launch).start();
             }
         });
         this.hBox.getChildren().add(canvasPlayer1);
@@ -174,14 +207,41 @@ public class Window extends Application {
                     for (int j = 0; j < 3; j++) {
                         if ((xMouse >= i * size && xMouse <= i * size + size)
                                 && (yMouse >= j * size && yMouse <= j * size + size)) {
-                            mother = new SpaceShip(i, j, size, new Image("/assets/mE0.png"), 1, 2, 1);
-                            spaceShips.add(mother);
-                            draw();
+
+                            mother = new SpaceShip(i, j, size, 2, 1, playerNumber);
+                            if (mCont < 1) {
+                                mP = spaceShips.size();
+                                spaceShips.add(mother);
+                                mCont++;
+                            } else {
+                                spaceShips.remove(mP);
+                                spaceShips.add(mother);
+                            }
+
+                            draw(gc1);
                         }
                     }
                 }
-            } else {
-
+            } else if (event.getSource() == canvasPlayer2 && playerNumber == 2 && state1 == true) {
+                double xMouse = event.getX();
+                double yMouse = event.getY();
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        if ((xMouse >= i * size && xMouse <= i * size + size)
+                                && (yMouse >= j * size && yMouse <= j * size + size)) {
+                            mother = new SpaceShip(i, j, size, 2, 1, playerNumber);
+                            if (mCont < 1) {
+                                mP = spaceShips.size();
+                                spaceShips.add(mother);
+                                mCont++;
+                            } else {
+                                spaceShips.remove(mP);
+                                spaceShips.add(mother);
+                            }
+                            draw(gc2);
+                        }
+                    }
+                }
             }
         }
     };
@@ -209,25 +269,25 @@ public class Window extends Application {
 
     } // drawGrid: dibuja las lineas del mosaico
 
-    public void draw() {
-        gc1.clearRect(0, 0, 570, 570);
-        drawGrid(gc1);
+    public void draw(GraphicsContext gc) {
+        gc.clearRect(0, 0, 570, 570);
+        drawGrid(gc);
         for (int i = 0; i < spaceShips.size(); i++) {
             if (spaceShips.get(i) != null) {
 
-                spaceShips.get(i).draw(gc1);
+                spaceShips.get(i).draw(gc);
 
             }
         }
 
         if (missile != null) {
             if (missile.isAlive() == true) {
-                missile.draw(gc1);
+                missile.draw(gc);
             }
         }
         if (portal != null) {
             if (portal.isAlive() == true) {
-                portal.draw(gc1);
+                portal.draw(gc);
             }
         }
     }

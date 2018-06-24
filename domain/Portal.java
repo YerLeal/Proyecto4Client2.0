@@ -78,7 +78,7 @@ public class Portal extends Thread {
             if (player == 1) {
                 this.sprites.add(new Image("/assets/p" + i + ".png"));
             } else {
-                this.sprites.add(new Image("/assets/md" + i + ".png"));
+                this.sprites.add(new Image("/assets/pD" + i + ".png"));
             }
         }
     }

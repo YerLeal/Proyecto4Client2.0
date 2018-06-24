@@ -18,25 +18,24 @@ import proyecto4client2.Window;
  */
 public class Missile extends Thread {
 
-    private int xI, yI, xF, yF;
+    private int xI, yI, xF, action;
     private ArrayList<Image> sprites;
     private int iCont, player;
-    private boolean end=false,end1=false;
-    
-    public Missile(int xI, int yI, int xF, int yF, int player) {
+    private boolean end = false, end1 = false;
+
+    public Missile(int xI, int yI, int xF, int player, int action) {
         this.xI = xI;
         this.yI = yI;
         this.xF = xF;
-        this.yF = yF;
         this.iCont = 0;
         this.player = player;
         this.sprites = new ArrayList<>();
         chargeSprites();
+        this.action = action;
     }
 
     @Override
     public void run() {
-
         while (xI != xF) {
             if (player == 1) {
                 xI += 10;
@@ -44,23 +43,25 @@ public class Missile extends Thread {
                 xI -= 10;
             }
             iCont++;
-
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Missile.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        end1=true;
-        iCont=4;
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Missile.class.getName()).log(Level.SEVERE, null, ex);
+        if (action == 1) {
+            end1 = true;
+            iCont = 4;
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Missile.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (end) {
+                Window.cosa = false;
+            }
         }
-        if(end){    
-            Window.cosa=false;
-        }
+
     }
 
     public void setEnd(boolean end) {
@@ -84,19 +85,18 @@ public class Missile extends Thread {
     public int getyI() {
         return yI;
     }
-    
 
     public void draw(GraphicsContext gc) {
-        if (iCont > 3 && end1!=true) {
+        if (iCont > 3 && end1 != true) {
             iCont = 0;
         }
-        
-        if(end1==true){
-            gc.drawImage(sprites.get(iCont), xI+20, yI + 45, 60, 60);
-        }else{
+
+        if (end1 == true) {
+            gc.drawImage(sprites.get(iCont), xI + 20, yI + 45, 60, 60);
+        } else {
             gc.drawImage(sprites.get(iCont), xI, yI + 65, 60, 20);
         }
-        
+
     }
 
 }

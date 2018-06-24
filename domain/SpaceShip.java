@@ -18,17 +18,15 @@ import javafx.scene.image.Image;
 public class SpaceShip extends Thread {
 
     private int x, y, size;
-    private Image image;
     private int life;
     private int iCont;
     private int type, player;
     private ArrayList<Image> sprites;
 
-    public SpaceShip(int x, int y, int size, Image image, int life, int type, int player) {
+    public SpaceShip(int x, int y, int size, int life, int type, int player) {
         this.x = x;
         this.y = y;
         this.size = size;
-        this.image = image;
         this.life = life;
         iCont = 0;
         this.player = player;
