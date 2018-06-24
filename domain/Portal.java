@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import proyecto4client.Window;
+import proyecto4client2.Window;
 
 /**
  *

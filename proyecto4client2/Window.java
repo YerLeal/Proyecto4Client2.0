@@ -1,4 +1,4 @@
-package proyecto4client;
+package proyecto4client2;
 
 import domain.Missile;
 import domain.Portal;
