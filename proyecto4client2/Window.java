@@ -3,6 +3,11 @@ package proyecto4client2;
 import domain.Missile;
 import domain.Portal;
 import domain.SpaceShip;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +33,7 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private int playerNumber;
+    private int playerNumber=1;
     private Button btnAddMother, btnLaunch;
     public static Boolean state1 = false, cosa = true;
     private SpaceShip mother;
@@ -37,7 +42,8 @@ public class Window extends Application {
     private int size = 150;
     private ArrayList<SpaceShip> spaceShips;
     private int x = 2, y = 2, mCont = 0, mP = 0;
-
+    private String serverIP="";
+    private int xO=2,yO=2;
     private Runnable launch = new Runnable() {
         @Override
         public void run() {
@@ -55,7 +61,6 @@ public class Window extends Application {
                 } else if ((portal.getX() + missile.getxI() < 100 && playerNumber == 2) && missile.isAlive() == true && portal.isAlive() == false) {
                     portal.start();
                 }
-                System.err.println(missile.getxI());
                 if ((missile.getxI() == portal.getX() && playerNumber == 1) || (missile.getxI() == portal.getX() + 5 && playerNumber == 2)) {
 
                     portal.setState(1);
@@ -69,69 +74,96 @@ public class Window extends Application {
                     Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            try {
+                Socket client=new Socket(serverIP, 5025);
+                DataOutputStream dat=new DataOutputStream(client.getOutputStream());
+                String data="192.168.56.1&"+xO+"&"+yO;
+                dat.writeUTF("atack");
+                dat.writeUTF(data);
+                dat.close();
+                client.close();
+                
+            } catch (IOException ex) {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     };
 
     private Runnable recieve = new Runnable() {
         @Override
         public void run() {
-            cosa = true;
-            if (playerNumber == 1) {
-                portal = portal = new Portal(420, y * size, playerNumber);
-            } else {
-                portal = portal = new Portal(0, y * size, playerNumber);
-            }
-            portal.start();
-            if (playerNumber == 1) {
-                missile = new Missile(430, y * size, x * size, 2, size);
-            } else {
-                missile = new Missile(0, y * size, x * size, 1, size);
-            }
-
-            missile.setEnd(true);
-            while (cosa) {
-
-                if (portal.getiCont() == 3 && missile.isAlive() == false) {
-                    missile.start();
-                }
-                if ((portal.getX() - missile.getxI() > 50 && playerNumber == 1) || (portal.getX() + missile.getxI() > 50 && playerNumber == 2)) {
-                    portal.setState(1);
-                }
-                auxDraw();
-                try {
-                    Thread.sleep(50);
-
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Window.class
-                            .getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-            for (int i = 0; i < spaceShips.size(); i++) {
-                int x = spaceShips.get(i).getX() * size;
-                int y = spaceShips.get(i).getY() * size;
-                if ((missile.getxI() >= x && missile.getxI() <= x + size)
-                        && (missile.getyI() >= y && missile.getyI() <= y + size)) {
-                    spaceShips.get(i).impact();
-                    if (spaceShips.get(i).getLife() == 0) {
-                        spaceShips.get(i).start();
-                        while (spaceShips.get(i).getiCont() < 9) {
-                            try {
-                                auxDraw();
-                                Thread.sleep(50);
-
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(Window.class
-                                        .getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                        spaceShips.remove(i);
+            try {
+                ServerSocket recibir = new ServerSocket(9090);
+                Socket entrada;
+                
+                while (true) {
+                    entrada=recibir.accept();
+                    DataInputStream data=new DataInputStream(entrada.getInputStream());
+                    String datos[]=data.readUTF().split("&");
+                    x=Integer.parseInt(datos[1]);
+                    y=Integer.parseInt(datos[2]);
+                    data.close();
+                    cosa = true;
+                    if (playerNumber == 1) {
+                        portal = portal = new Portal(420, y * size, playerNumber);
+                    } else {
+                        portal = portal = new Portal(0, y * size, playerNumber);
                     }
-                    break;
-                }
-            }
+                    portal.start();
+                    if (playerNumber == 1) {
+                        missile = new Missile(430, y * size, x * size, 2, size);
+                    } else {
+                        missile = new Missile(0, y * size, x * size, 1, size);
+                    }
 
-            auxDraw();
+                    missile.setEnd(true);
+                    while (cosa) {
+
+                        if (portal.getiCont() == 3 && missile.isAlive() == false) {
+                            missile.start();
+                        }
+                        if ((portal.getX() - missile.getxI() > 50 && playerNumber == 1) || (portal.getX() + missile.getxI() > 50 && playerNumber == 2)) {
+                            portal.setState(1);
+                        }
+                        auxDraw();
+                        try {
+                            Thread.sleep(50);
+
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Window.class
+                                    .getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                    for (int i = 0; i < spaceShips.size(); i++) {
+                        int x = spaceShips.get(i).getX() * size;
+                        int y = spaceShips.get(i).getY() * size;
+                        if ((missile.getxI() >= x && missile.getxI() <= x + size)
+                                && (missile.getyI() >= y && missile.getyI() <= y + size)) {
+                            spaceShips.get(i).impact();
+                            if (spaceShips.get(i).getLife() == 0) {
+                                spaceShips.get(i).start();
+                                while (spaceShips.get(i).getiCont() < 9) {
+                                    try {
+                                        auxDraw();
+                                        Thread.sleep(50);
+
+                                    } catch (InterruptedException ex) {
+                                        Logger.getLogger(Window.class
+                                                .getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                }
+                                spaceShips.remove(i);
+                            }
+                            break;
+                        }
+                    }
+
+                    auxDraw();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     };
@@ -156,6 +188,7 @@ public class Window extends Application {
         });
         primaryStage.resizableProperty().set(false);
         primaryStage.show();
+        new Thread(recieve).start();
     } // start
 
     private void init(Stage primaryStage) {
@@ -181,9 +214,9 @@ public class Window extends Application {
         btnLaunch.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-//                cosa = true;
-//                new Thread(launch).start();
-                getMyNumber();
+                cosa = true;
+                new Thread(launch).start();
+//                getMyNumber();
             }
         });
         this.hBox.getChildren().add(canvasPlayer1);
@@ -274,9 +307,7 @@ public class Window extends Application {
         drawGrid(gc);
         for (int i = 0; i < spaceShips.size(); i++) {
             if (spaceShips.get(i) != null) {
-
                 spaceShips.get(i).draw(gc);
-
             }
         }
 
@@ -297,6 +328,14 @@ public class Window extends Application {
         client.setAction("log");
         client.setNamePlayer("Yer");
         client.start();
+        while (client.getNumberPlayer() == -1) {
+            System.err.println("djajsdja");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         this.playerNumber = client.getNumberPlayer();
         System.out.println("Main " + this.playerNumber);
     }

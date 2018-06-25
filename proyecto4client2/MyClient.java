@@ -35,7 +35,7 @@ public class MyClient extends Thread {
         try {
             InetAddress address = InetAddress.getByName(utilities.Constants.address);
             Socket socket = new Socket(address, this.socketPortNumber);
-
+            String adress=String.valueOf(InetAddress.getLocalHost());
             send = new DataOutputStream(socket.getOutputStream());
             DataInputStream receive = new DataInputStream(socket.getInputStream());
 
@@ -80,13 +80,13 @@ public class MyClient extends Thread {
         return this.numberPlayer;
     }
     
-    public static void main(String[] args) {
-        String s = JOptionPane.showInputDialog("direc");
-        utilities.Constants.address = s;
-        MyClient client = new MyClient();
-        client.setAction("log");
-        client.setNamePlayer("Yer");
-        client.start();
-    }
+//    public static void main(String[] args) {
+//        String s = JOptionPane.showInputDialog("direc");
+//        utilities.Constants.address = s;
+//        MyClient client = new MyClient();
+//        client.setAction("log");
+//        client.setNamePlayer("Yer");
+//        client.start();
+//    }
 
 } // end class
