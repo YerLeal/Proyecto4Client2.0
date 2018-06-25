@@ -35,7 +35,7 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private int playerNumber=-1;
+    private int playerNumber = -1;
     private Button btnAddMother, btnLaunch;
     public static Boolean state1 = false, cosa = true;
     private SpaceShip mother;
@@ -44,13 +44,13 @@ public class Window extends Application {
     private int size = 150;
     private ArrayList<SpaceShip> spaceShips;
     private int x = 2, y = 2, mCont = 0, mP = 0;
-    private String serverIP="";
-    private int xO=2,yO=2;
+    private String serverIP = "";
+    private int xO = 2, yO = 2;
     private Label lbName;
     private TextField tfdName;
     private Button btnOk;
     private String namePlayer;
-    
+
     private Runnable launch = new Runnable() {
         @Override
         public void run() {
@@ -82,14 +82,14 @@ public class Window extends Application {
                 }
             }
             try {
-                Socket client=new Socket(serverIP, 5025);
-                DataOutputStream dat=new DataOutputStream(client.getOutputStream());
-                String data="192.168.56.1&"+xO+"&"+yO;
-                dat.writeUTF("atack");
-                dat.writeUTF(data);
+                Socket client = new Socket(utilities.Constants.address, utilities.Constants.socketPortNumber);
+                DataOutputStream dat = new DataOutputStream(client.getOutputStream());
+
+                dat.writeUTF("attack&" + playerNumber + "&" + xO + "&" + yO);
+
                 dat.close();
                 client.close();
-                
+
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -102,13 +102,13 @@ public class Window extends Application {
             try {
                 ServerSocket recibir = new ServerSocket(9090);
                 Socket entrada;
-                
+
                 while (true) {
-                    entrada=recibir.accept();
-                    DataInputStream data=new DataInputStream(entrada.getInputStream());
-                    String datos[]=data.readUTF().split("&");
-                    x=Integer.parseInt(datos[1]);
-                    y=Integer.parseInt(datos[2]);
+                    entrada = recibir.accept();
+                    DataInputStream data = new DataInputStream(entrada.getInputStream());
+                    String datos[] = data.readUTF().split("&");
+                    x = Integer.parseInt(datos[0]);
+                    y = Integer.parseInt(datos[1]);
                     data.close();
                     cosa = true;
                     if (playerNumber == 1) {
@@ -210,10 +210,13 @@ public class Window extends Application {
                     Socket socket = new Socket(utilities.Constants.address, utilities.Constants.socketPortNumber);
                     DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
                     DataInputStream dis = new DataInputStream(socket.getInputStream());
-                    dos.writeUTF("log&"+namePlayer);
+                    dos.writeUTF("log&" + namePlayer);
                     String m = dis.readUTF();
                     System.out.println(m);
                     playerNumber = Integer.parseInt(m);
+                    dos.close();
+                    dis.close();
+                    socket.close();
                 } catch (IOException ex) {
                     Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                 }
