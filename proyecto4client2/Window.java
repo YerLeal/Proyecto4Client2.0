@@ -18,6 +18,8 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -33,7 +35,7 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private int playerNumber=1;
+    private int playerNumber=-1;
     private Button btnAddMother, btnLaunch;
     public static Boolean state1 = false, cosa = true;
     private SpaceShip mother;
@@ -44,6 +46,11 @@ public class Window extends Application {
     private int x = 2, y = 2, mCont = 0, mP = 0;
     private String serverIP="";
     private int xO=2,yO=2;
+    private Label lbName;
+    private TextField tfdName;
+    private Button btnOk;
+    private String namePlayer;
+    
     private Runnable launch = new Runnable() {
         @Override
         public void run() {
@@ -192,6 +199,27 @@ public class Window extends Application {
     } // start
 
     private void init(Stage primaryStage) {
+        this.lbName = new Label("Name: ");
+        this.tfdName = new TextField();
+        this.btnOk = new Button("Ok");
+        this.btnOk.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    namePlayer = tfdName.getText();
+                    Socket socket = new Socket(utilities.Constants.address, utilities.Constants.socketPortNumber);
+                    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                    DataInputStream dis = new DataInputStream(socket.getInputStream());
+                    dos.writeUTF("log&"+namePlayer);
+                    String m = dis.readUTF();
+                    System.out.println(m);
+                    playerNumber = Integer.parseInt(m);
+                } catch (IOException ex) {
+                    Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
         spaceShips = new ArrayList<>();
         this.hBox = new HBox();
         this.pane = new BorderPane();
@@ -223,7 +251,7 @@ public class Window extends Application {
         this.hBox.getChildren().add(canvasPlayer2);
         this.pane.setCenter(hBox);
         HBox b = new HBox();
-        b.getChildren().addAll(btnAddMother, btnLaunch);
+        b.getChildren().addAll(btnAddMother, btnLaunch, lbName, tfdName, btnOk);
         this.pane.setBottom(b);
         this.scene = new Scene(this.pane, WIDTH, HEIGHT);
         primaryStage.setScene(scene);
