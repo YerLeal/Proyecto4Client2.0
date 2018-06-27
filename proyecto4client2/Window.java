@@ -19,12 +19,16 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import utilities.Constants;
 
 public class Window extends Application {
 
@@ -35,7 +39,7 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private Button btnAddMother, btnLaunch, btnOk;
+    private Button btnAddMother, btnLaunch, btnOk,btnSendMessage;
     public static Boolean state1 = false, flag = true;
     private boolean myTurn;
     private SpaceShip mother;
@@ -44,9 +48,31 @@ public class Window extends Application {
     private ArrayList<SpaceShip> spaceShips;
     private int x, y, xO, yO, mCont = 0, mP = 0, playerNumber = -1, size = 150;
     private Label lbName;
-    private TextField tfdName;
+    private TextArea chat;
+    private TextField tfdName,tfdMessage;
     private String namePlayer;
 
+    private Runnable chatThread= new Runnable() {
+        @Override
+        public void run() {
+            try {
+                ServerSocket chatServer=new ServerSocket(Constants.chatPortNumber);
+                Socket chatConnection;
+                while(true){
+                    chatConnection=chatServer.accept();
+                    DataInputStream recieve=new DataInputStream(chatConnection.getInputStream());
+                    chat.appendText(recieve.readUTF()+"\n");
+                    recieve.close();
+                    chatConnection.close();
+                }
+                
+            } catch (IOException ex) {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+    };
+    
     private Runnable launch = new Runnable() {
         @Override
         public void run() {
@@ -189,6 +215,7 @@ public class Window extends Application {
         primaryStage.resizableProperty().set(false);
         primaryStage.show();
         new Thread(this.recieve).start();
+        new Thread(this.chatThread).start();
     } // start
 
     private void init(Stage primaryStage) {
@@ -246,12 +273,34 @@ public class Window extends Application {
                 new Thread(launch).start();
             }
         });
-        this.hBox.getChildren().add(this.canvasPlayer1);
-        this.hBox.getChildren().add(this.canvasPlayer2);
+        Pane chatPane=new Pane();
+        chatPane.setPrefSize(450, 700);
+        this.chat=new TextArea();
+        this.chat.relocate(75, 0);
+        this.chat.setPrefSize(300, 450);
+        this.btnSendMessage=new Button("Send");
+        this.btnSendMessage.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    Socket socket=new Socket(Constants.address, Constants.socketPortNumber);
+                    DataOutputStream dat=new DataOutputStream(socket.getOutputStream());
+                    dat.writeUTF("chat&"+playerNumber+"&"+tfdMessage);
+                    dat.close();
+                    socket.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        chatPane.getChildren().addAll(chat,btnSendMessage);
+        this.hBox.getChildren().addAll(this.canvasPlayer1,this.canvasPlayer2);
         this.pane.setCenter(this.hBox);
         HBox b = new HBox();
+        b.setPrefSize(500, 200);
         b.getChildren().addAll(this.btnAddMother, this.btnLaunch, this.lbName, this.tfdName, this.btnOk);
         this.pane.setBottom(b);
+        this.pane.setRight(chatPane);
         this.scene = new Scene(this.pane, WIDTH, HEIGHT);
         primaryStage.setScene(scene);
     } // init
