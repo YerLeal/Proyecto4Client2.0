@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package domain;
 
 import java.util.ArrayList;
@@ -12,10 +7,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import proyecto4client2.Window;
 
-/**
- *
- * @author maikel
- */
 public class Missile extends Thread {
 
     private int xI, yI, xF, action;
@@ -32,11 +23,10 @@ public class Missile extends Thread {
         this.sprites = new ArrayList<>();
         chargeSprites();
         this.action = action;
-    }
+    } // constructor
 
     @Override
     public void run() {
-//        System.err.println("Missile Init");
         while (xI != xF) {
             if (player == 1) {
                 xI += 10;
@@ -62,8 +52,7 @@ public class Missile extends Thread {
                 Window.flag = false;
             }
         }
-        //System.err.println("Missile Dead");
-    }
+    } // run
 
     public void setEnd(boolean end) {
         this.end = end;
@@ -77,7 +66,7 @@ public class Missile extends Thread {
                 this.sprites.add(new Image("/assets/md" + i + ".png"));
             }
         }
-    }
+    } // chargeSprites
 
     public int getxI() {
         return xI;
@@ -97,7 +86,6 @@ public class Missile extends Thread {
         } else {
             gc.drawImage(sprites.get(iCont), xI, yI + 65, 60, 20);
         }
+    } // draw
 
-    }
-
-}
+} // end class

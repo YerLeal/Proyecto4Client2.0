@@ -11,7 +11,7 @@ public class Portal extends Thread {
 
     private int x, y;
     private ArrayList<Image> sprites;
-    private int iCont, player;
+    private int imageCount, player;
     private int state = 0;
     private boolean flag = true;
     private boolean end = false;
@@ -19,7 +19,7 @@ public class Portal extends Thread {
     public Portal(int x, int y, int player) {
         this.x = x;
         this.y = y;
-        this.iCont = 7;
+        this.imageCount = 7;
         this.player = player;
         this.sprites = new ArrayList<>();
         chargeSprites();
@@ -36,7 +36,7 @@ public class Portal extends Thread {
                     Window.flag = false;
                 }
             } else {
-                this.iCont--;
+                this.imageCount--;
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException ex) {
@@ -55,13 +55,13 @@ public class Portal extends Thread {
         this.state = state;
     }
 
-    public int getiCont() {
-        return this.iCont;
-    }
+    public int getImageCount() {
+        return this.imageCount;
+    } // getImageCount
 
     public void setEnd(boolean end) {
         this.end = end;
-    }
+    } // setEnd
 
     public void chargeSprites() {
         for (int i = 0; i < 9; i++) {
@@ -74,8 +74,8 @@ public class Portal extends Thread {
     } // chargeSprites
 
     public void portalClose() {
-        while (this.iCont < 8) {
-            this.iCont++;
+        while (this.imageCount < 8) {
+            this.imageCount++;
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
@@ -86,10 +86,10 @@ public class Portal extends Thread {
     } // portalClose
 
     public void draw(GraphicsContext gc) {
-        if (this.iCont < 0) {
-            this.iCont = 3;
+        if (this.imageCount < 0) {
+            this.imageCount = 3;
         }
-        gc.drawImage(this.sprites.get(this.iCont), this.x, this.y, 35, 150);
+        gc.drawImage(this.sprites.get(this.imageCount), this.x, this.y, 35, 150);
     } // draw
 
 } // end class
