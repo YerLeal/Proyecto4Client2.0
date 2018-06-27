@@ -29,6 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javax.swing.JOptionPane;
 import utilities.Constants;
 
 public class Window extends Application {
@@ -40,7 +41,7 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private Button btnAddMother, btnLaunch, btnOk,btnSendMessage;
+    private Button btnAddMother, btnLaunch, btnOk, btnSendMessage;
     public static Boolean state1 = false, flag = true;
     private boolean myTurn;
     private SpaceShip mother;
@@ -50,31 +51,31 @@ public class Window extends Application {
     private int x, y, xO, yO, mCont = 0, mP = 0, playerNumber = -1, size = 150;
     private Label lbName;
     private TextArea chat;
-    private TextField tfdName,tfdMessage;
+    private TextField tfdName, tfdMessage;
     private String namePlayer;
 
-    private Runnable chatThread= new Runnable() {
+    private Runnable chatThread = new Runnable() {
         @Override
         public void run() {
             try {
-                ServerSocket chatServer=new ServerSocket(Constants.chatPortNumber);
+                ServerSocket chatServer = new ServerSocket(Constants.chatPortNumber);
                 Socket chatConnection;
-                while(true){
-                    chatConnection=chatServer.accept();
-                    DataInputStream recieve=new DataInputStream(chatConnection.getInputStream());
+                while (true) {
+                    chatConnection = chatServer.accept();
+                    DataInputStream recieve = new DataInputStream(chatConnection.getInputStream());
                     chat.setStyle("-fx-text-inner-color: red;");
-                    chat.appendText(recieve.readUTF()+"\n");
+                    chat.appendText(recieve.readUTF() + "\n");
                     recieve.close();
                     chatConnection.close();
                 }
-                
+
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
     };
-    
+
     private Runnable launch = new Runnable() {
         @Override
         public void run() {
@@ -129,65 +130,72 @@ public class Window extends Application {
                     entrada = recibir.accept();
                     DataInputStream data = new DataInputStream(entrada.getInputStream());
                     String datos[] = data.readUTF().split("&");
-                    x = Integer.parseInt(datos[0]);
-                    y = Integer.parseInt(datos[1]);
-                    data.close();
-                    flag = true;
-                    if (playerNumber == 1) {
-                        portal = portal = new Portal(420, y * size, playerNumber);
-                        portal.start();
+                    if (datos[0].equalsIgnoreCase("end")) {
+                        
                     } else {
-                        portal = portal = new Portal(0, y * size, playerNumber);
-                        portal.start();
-                    }
-                    if (playerNumber == 1) {
-                        missile = new Missile(430, y * size, x * size, 2, 1);
-                    } else {
-                        missile = new Missile(0, y * size, x * size, 1, 1);
-                    }
-                    missile.setEnd(true);
-                    while (flag) {
-                        if (portal.getImageCount() == 3 && missile.isAlive() == false) {
-                            missile.start();
+                        x = Integer.parseInt(datos[0]);
+                        y = Integer.parseInt(datos[1]);
+                        data.close();
+                        flag = true;
+                        if (playerNumber == 1) {
+                            portal = portal = new Portal(420, y * size, playerNumber);
+                            portal.start();
+                        } else {
+                            portal = portal = new Portal(0, y * size, playerNumber);
+                            portal.start();
                         }
-                        if ((portal.getX() - missile.getxI() > 50 && playerNumber == 1) || (portal.getX() + missile.getxI() > 50 && playerNumber == 2)) {
-                            portal.setState(1);
+                        if (playerNumber == 1) {
+                            missile = new Missile(430, y * size, x * size, 2, 1);
+                        } else {
+                            missile = new Missile(0, y * size, x * size, 1, 1);
                         }
-                        auxDraw();
-                        try {
-                            Thread.sleep(50);
-
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Window.class
-                                    .getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    for (int i = 0; i < spaceShips.size(); i++) {
-                        int x = spaceShips.get(i).getX() * size;
-                        int y = spaceShips.get(i).getY() * size;
-                        if ((missile.getxI() >= x && missile.getxI() <= x + size)
-                                && (missile.getyI() >= y && missile.getyI() <= y + size)) {
-                            spaceShips.get(i).impact();
-                            //System.out.println(x+" "+y);
-                            if (spaceShips.get(i).getLife() == 0) {
-                                spaceShips.get(i).start();
-                                while (spaceShips.get(i).getImageCount() < 9) {
-                                    try {
-                                        auxDraw();
-                                        Thread.sleep(50);
-
-                                    } catch (InterruptedException ex) {
-                                        Logger.getLogger(Window.class
-                                                .getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                }
-                                spaceShips.remove(i);
+                        missile.setEnd(true);
+                        while (flag) {
+                            if (portal.getImageCount() == 3 && missile.isAlive() == false) {
+                                missile.start();
                             }
-                            break;
+                            if ((portal.getX() - missile.getxI() > 50 && playerNumber == 1) || (portal.getX() + missile.getxI() > 50 && playerNumber == 2)) {
+                                portal.setState(1);
+                            }
+                            auxDraw();
+                            try {
+                                Thread.sleep(50);
+
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(Window.class
+                                        .getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                        for (int i = 0; i < spaceShips.size(); i++) {
+                            int x = spaceShips.get(i).getX() * size;
+                            int y = spaceShips.get(i).getY() * size;
+                            if ((missile.getxI() >= x && missile.getxI() <= x + size)
+                                    && (missile.getyI() >= y && missile.getyI() <= y + size)) {
+                                spaceShips.get(i).impact();
+                                //System.out.println(x+" "+y);
+                                if (spaceShips.get(i).getLife() == 0) {
+                                    spaceShips.get(i).start();
+                                    while (spaceShips.get(i).getImageCount() < 9) {
+                                        try {
+                                            auxDraw();
+                                            Thread.sleep(50);
+
+                                        } catch (InterruptedException ex) {
+                                            Logger.getLogger(Window.class
+                                                    .getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+                                    if(i==mCont){
+                                        JOptionPane.showMessageDialog(null, "Mother is dead");
+                                    }
+                                    spaceShips.remove(i);
+                                }
+                                break;
+                            }
                         }
                     }
+
                     auxDraw();
-                    portal = null;
                     myTurn = true;
                 }
             } catch (IOException ex) {
@@ -195,6 +203,8 @@ public class Window extends Application {
             }
         }
     };
+    
+    
 
     public void auxDraw() {
         if (this.playerNumber == 1) {
@@ -275,26 +285,26 @@ public class Window extends Application {
                 new Thread(launch).start();
             }
         });
-        Pane chatPane=new Pane();
+        Pane chatPane = new Pane();
         chatPane.setPrefSize(450, 700);
-        this.chat=new TextArea();
+        this.chat = new TextArea();
         this.chat.relocate(75, 0);
         this.chat.setPrefSize(300, 450);
-        this.btnSendMessage=new Button("Send");
-        this.tfdMessage=new TextField();
+        this.btnSendMessage = new Button("Send");
+        this.tfdMessage = new TextField();
         this.tfdMessage.relocate(120, 480);
         this.btnSendMessage.relocate(300, 480);
         this.btnSendMessage.setOnAction(new EventHandler<ActionEvent>() {
-           
+
             @Override
             public void handle(ActionEvent event) {
-               chat.setStyle("-fx-text-inner-color: blue;");
-               String message=namePlayer+":"+tfdMessage.getText()+"\n";
-               chat.appendText(message);
+                chat.setStyle("-fx-text-inner-color: blue;");
+                String message = namePlayer + ":" + tfdMessage.getText() + "\n";
+                chat.appendText(message);
                 try {
-                    Socket socket=new Socket(Constants.address, Constants.socketPortNumber);
-                    DataOutputStream dat=new DataOutputStream(socket.getOutputStream());
-                    dat.writeUTF("chat&"+playerNumber+"&"+tfdMessage.getText());
+                    Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
+                    DataOutputStream dat = new DataOutputStream(socket.getOutputStream());
+                    dat.writeUTF("chat&" + playerNumber + "&" + tfdMessage.getText());
                     dat.close();
                     socket.close();
                 } catch (IOException ex) {
@@ -303,9 +313,9 @@ public class Window extends Application {
                 tfdMessage.clear();
             }
         });
-        
-        chatPane.getChildren().addAll(chat,btnSendMessage,tfdMessage);
-        this.hBox.getChildren().addAll(this.canvasPlayer1,this.canvasPlayer2);
+
+        chatPane.getChildren().addAll(chat, btnSendMessage, tfdMessage);
+        this.hBox.getChildren().addAll(this.canvasPlayer1, this.canvasPlayer2);
         this.pane.setCenter(this.hBox);
         HBox b = new HBox();
         b.setPrefSize(500, 200);
