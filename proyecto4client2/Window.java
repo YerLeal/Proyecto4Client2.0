@@ -185,7 +185,7 @@ public class Window extends Application {
                                                     .getName()).log(Level.SEVERE, null, ex);
                                         }
                                     }
-                                    if(i==mCont){
+                                    if(i==mP){
                                         JOptionPane.showMessageDialog(null, "Mother is dead");
                                     }
                                     spaceShips.remove(i);
@@ -371,6 +371,19 @@ public class Window extends Application {
                     }
                 }
             } else if (playerNumber == 1 && event.getSource() == canvasPlayer2 && myTurn) {
+                double xMouse = event.getX();
+                double yMouse = event.getY();
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        if ((xMouse >= i * size && xMouse <= i * size + size)
+                                && (yMouse >= j * size && yMouse <= j * size + size)) {
+                            xO = i;
+                            yO = j;
+                            System.out.println(xO + " " + yO);
+                        }
+                    }
+                }
+            }else if (playerNumber == 2 && event.getSource() == canvasPlayer1 && myTurn) {
                 double xMouse = event.getX();
                 double yMouse = event.getY();
                 for (int i = 0; i < 3; i++) {
