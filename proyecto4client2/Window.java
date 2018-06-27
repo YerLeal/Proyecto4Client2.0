@@ -279,6 +279,9 @@ public class Window extends Application {
         this.chat.relocate(75, 0);
         this.chat.setPrefSize(300, 450);
         this.btnSendMessage=new Button("Send");
+        this.tfdMessage=new TextField();
+        this.tfdMessage.relocate(0, 480);
+        this.btnSendMessage.relocate(300, 480);
         this.btnSendMessage.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -293,7 +296,7 @@ public class Window extends Application {
                 }
             }
         });
-        chatPane.getChildren().addAll(chat,btnSendMessage);
+        chatPane.getChildren().addAll(chat,btnSendMessage,tfdMessage);
         this.hBox.getChildren().addAll(this.canvasPlayer1,this.canvasPlayer2);
         this.pane.setCenter(this.hBox);
         HBox b = new HBox();
