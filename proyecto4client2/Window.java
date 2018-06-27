@@ -35,7 +35,7 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private int playerNumber;
+    private int playerNumber=-1;
     private Button btnAddMother, btnLaunch;
     public static Boolean state1 = false, flag = true;
     private SpaceShip mother;
