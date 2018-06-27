@@ -26,6 +26,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import utilities.Constants;
@@ -61,6 +62,7 @@ public class Window extends Application {
                 while(true){
                     chatConnection=chatServer.accept();
                     DataInputStream recieve=new DataInputStream(chatConnection.getInputStream());
+                    chat.setStyle("-fx-text-inner-color: red;");
                     chat.appendText(recieve.readUTF()+"\n");
                     recieve.close();
                     chatConnection.close();
@@ -280,22 +282,28 @@ public class Window extends Application {
         this.chat.setPrefSize(300, 450);
         this.btnSendMessage=new Button("Send");
         this.tfdMessage=new TextField();
-        this.tfdMessage.relocate(0, 480);
+        this.tfdMessage.relocate(120, 480);
         this.btnSendMessage.relocate(300, 480);
         this.btnSendMessage.setOnAction(new EventHandler<ActionEvent>() {
+           
             @Override
             public void handle(ActionEvent event) {
+               chat.setStyle("-fx-text-inner-color: blue;");
+               String message=namePlayer+":"+tfdMessage.getText()+"\n";
+               chat.appendText(message);
                 try {
                     Socket socket=new Socket(Constants.address, Constants.socketPortNumber);
                     DataOutputStream dat=new DataOutputStream(socket.getOutputStream());
-                    dat.writeUTF("chat&"+playerNumber+"&"+tfdMessage);
+                    dat.writeUTF("chat&"+playerNumber+"&"+tfdMessage.getText());
                     dat.close();
                     socket.close();
                 } catch (IOException ex) {
                     Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                tfdMessage.clear();
             }
         });
+        
         chatPane.getChildren().addAll(chat,btnSendMessage,tfdMessage);
         this.hBox.getChildren().addAll(this.canvasPlayer1,this.canvasPlayer2);
         this.pane.setCenter(this.hBox);
