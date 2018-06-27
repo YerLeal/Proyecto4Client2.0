@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package domain;
 
 import java.util.ArrayList;
@@ -12,10 +7,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import proyecto4client2.Window;
 
-/**
- *
- * @author maikel
- */
 public class Portal extends Thread {
 
     private int x, y;
@@ -23,7 +14,8 @@ public class Portal extends Thread {
     private int iCont, player;
     private int state = 0;
     private boolean flag = true;
-    private boolean end=false;
+    private boolean end = false;
+
     public Portal(int x, int y, int player) {
         this.x = x;
         this.y = y;
@@ -31,34 +23,20 @@ public class Portal extends Thread {
         this.player = player;
         this.sprites = new ArrayList<>();
         chargeSprites();
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-    
-    
+    } // constructor
 
     @Override
     public void run() {
-//        System.err.println("Portal Init");
-        flag=true;
-        state=0;
-        while (flag) {
-            //System.out.println(state);
-            if (state == 1) {
-                //System.err.println("Portal close");
+        this.flag = true;
+        this.state = 0;
+        while (this.flag) {
+            if (this.state == 1) {
                 portalClose();
-                if(end){
-                    Window.flag=false;
+                if (this.end) {
+                    Window.flag = false;
                 }
             } else {
-                iCont--;
-
+                this.iCont--;
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException ex) {
@@ -66,12 +44,19 @@ public class Portal extends Thread {
                 }
             }
 
-        }
-        //System.err.println("Portal Dead");
+        };
+    } // run
+
+    public int getX() {
+        return this.x;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 
     public int getiCont() {
-        return iCont;
+        return this.iCont;
     }
 
     public void setEnd(boolean end) {
@@ -86,25 +71,25 @@ public class Portal extends Thread {
                 this.sprites.add(new Image("/assets/pD" + i + ".png"));
             }
         }
-    }
+    } // chargeSprites
 
     public void portalClose() {
-        while (iCont < 8) {
-            iCont++;
+        while (this.iCont < 8) {
+            this.iCont++;
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Portal.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        flag = false;
-    }
+        this.flag = false;
+    } // portalClose
 
     public void draw(GraphicsContext gc) {
-        if (iCont < 0) {
-            iCont = 3;
+        if (this.iCont < 0) {
+            this.iCont = 3;
         }
-        gc.drawImage(sprites.get(iCont), x, y, 35, 150);
-    }
+        gc.drawImage(this.sprites.get(this.iCont), this.x, this.y, 35, 150);
+    } // draw
 
-}
+} // end class
