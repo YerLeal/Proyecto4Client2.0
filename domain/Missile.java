@@ -36,6 +36,7 @@ public class Missile extends Thread {
 
     @Override
     public void run() {
+//        System.err.println("Missile Init");
         while (xI != xF) {
             if (player == 1) {
                 xI += 10;
@@ -58,10 +59,10 @@ public class Missile extends Thread {
                 Logger.getLogger(Missile.class.getName()).log(Level.SEVERE, null, ex);
             }
             if (end) {
-                Window.cosa = false;
+                Window.flag = false;
             }
         }
-
+        //System.err.println("Missile Dead");
     }
 
     public void setEnd(boolean end) {

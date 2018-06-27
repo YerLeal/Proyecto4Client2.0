@@ -35,21 +35,21 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private int playerNumber = -1;
+    private int playerNumber = 1;
     private Button btnAddMother, btnLaunch;
-    public static Boolean state1 = false, cosa = true;
+    public static Boolean state1 = false, flag = true;
     private SpaceShip mother;
     private Missile missile;
     private Portal portal;
     private int size = 150;
     private ArrayList<SpaceShip> spaceShips;
-    private int x = 2, y = 2, mCont = 0, mP = 0;
-    private String serverIP = "";
+    private int x , y, mCont = 0, mP = 0;
     private int xO = 2, yO = 2;
     private Label lbName;
     private TextField tfdName;
     private Button btnOk;
     private String namePlayer;
+    private boolean myTurn=true;
 
     private Runnable launch = new Runnable() {
         @Override
@@ -62,14 +62,15 @@ public class Window extends Application {
                 portal = new Portal(-5, mother.getY() * size, 2);
             }
             missile.start();
-            while (cosa) {
+            while (flag) {
                 if (portal.getX() - missile.getxI() < 100 && playerNumber == 1 && missile.isAlive() == true && portal.isAlive() == false) {
+                    System.out.println("Entra");
                     portal.start();
                 } else if ((portal.getX() + missile.getxI() < 100 && playerNumber == 2) && missile.isAlive() == true && portal.isAlive() == false) {
                     portal.start();
                 }
                 if ((missile.getxI() == portal.getX() && playerNumber == 1) || (missile.getxI() == portal.getX() + 5 && playerNumber == 2)) {
-
+                    System.out.println("ENTRA DONDE NO");
                     portal.setState(1);
                     portal.setEnd(true);
                 }
@@ -93,6 +94,7 @@ public class Window extends Application {
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
+            myTurn = false;
         }
     };
 
@@ -110,26 +112,29 @@ public class Window extends Application {
                     x = Integer.parseInt(datos[0]);
                     y = Integer.parseInt(datos[1]);
                     data.close();
-                    cosa = true;
+                    flag = true;
                     if (playerNumber == 1) {
                         portal = portal = new Portal(420, y * size, playerNumber);
+                        portal.start();
                     } else {
                         portal = portal = new Portal(0, y * size, playerNumber);
+                        portal.start();
                     }
-                    portal.start();
+
                     if (playerNumber == 1) {
-                        missile = new Missile(430, y * size, x * size, 2, size);
+                        missile = new Missile(430, y * size, x * size, 2, 1);
                     } else {
-                        missile = new Missile(0, y * size, x * size, 1, size);
+                        missile = new Missile(0, y * size, x * size, 1, 1);
                     }
 
                     missile.setEnd(true);
-                    while (cosa) {
+                    while (flag) {
 
                         if (portal.getiCont() == 3 && missile.isAlive() == false) {
                             missile.start();
                         }
                         if ((portal.getX() - missile.getxI() > 50 && playerNumber == 1) || (portal.getX() + missile.getxI() > 50 && playerNumber == 2)) {
+                            System.out.println("ENTRA DONDE NO 2");
                             portal.setState(1);
                         }
                         auxDraw();
@@ -148,6 +153,7 @@ public class Window extends Application {
                         if ((missile.getxI() >= x && missile.getxI() <= x + size)
                                 && (missile.getyI() >= y && missile.getyI() <= y + size)) {
                             spaceShips.get(i).impact();
+                            System.out.println(x+" "+y);
                             if (spaceShips.get(i).getLife() == 0) {
                                 spaceShips.get(i).start();
                                 while (spaceShips.get(i).getiCont() < 9) {
@@ -167,6 +173,8 @@ public class Window extends Application {
                     }
 
                     auxDraw();
+                    portal = null;
+                    myTurn = true;
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,6 +222,11 @@ public class Window extends Application {
                     String m = dis.readUTF();
                     System.out.println(m);
                     playerNumber = Integer.parseInt(m);
+                    if (playerNumber == 1) {
+                        myTurn = true;
+                    } else {
+                        myTurn = false;
+                    }
                     dos.close();
                     dis.close();
                     socket.close();
@@ -245,7 +258,7 @@ public class Window extends Application {
         btnLaunch.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                cosa = true;
+                flag = true;
                 new Thread(launch).start();
 //                getMyNumber();
             }
@@ -305,6 +318,19 @@ public class Window extends Application {
                         }
                     }
                 }
+            } else if (playerNumber == 1 && event.getSource() == canvasPlayer2 && myTurn) {
+                double xMouse = event.getX();
+                double yMouse = event.getY();
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        if ((xMouse >= i * size && xMouse <= i * size + size)
+                                && (yMouse >= j * size && yMouse <= j * size + size)) {
+                            xO=i;
+                            yO=j;
+                            System.out.println(xO+" "+yO);
+                        }
+                    }
+                }
             }
         }
     };
@@ -354,21 +380,8 @@ public class Window extends Application {
         }
     }
 
-    public void getMyNumber() {
-        MyClient client = new MyClient();
-        client.setAction("log");
-        client.setNamePlayer("Yer");
-        client.start();
-        while (client.getNumberPlayer() == -1) {
-            System.err.println("djajsdja");
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        this.playerNumber = client.getNumberPlayer();
-        System.out.println("Main " + this.playerNumber);
+    public void selectEnemyPosition() {
+
     }
 
 } // end class

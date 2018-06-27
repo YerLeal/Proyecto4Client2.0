@@ -22,7 +22,7 @@ public class Portal extends Thread {
     private ArrayList<Image> sprites;
     private int iCont, player;
     private int state = 0;
-    private boolean s = true;
+    private boolean flag = true;
     private boolean end=false;
     public Portal(int x, int y, int player) {
         this.x = x;
@@ -45,12 +45,16 @@ public class Portal extends Thread {
 
     @Override
     public void run() {
-
-        while (s) {
+//        System.err.println("Portal Init");
+        flag=true;
+        state=0;
+        while (flag) {
+            //System.out.println(state);
             if (state == 1) {
+                //System.err.println("Portal close");
                 portalClose();
                 if(end){
-                    Window.cosa=false;
+                    Window.flag=false;
                 }
             } else {
                 iCont--;
@@ -63,6 +67,7 @@ public class Portal extends Thread {
             }
 
         }
+        //System.err.println("Portal Dead");
     }
 
     public int getiCont() {
@@ -92,7 +97,7 @@ public class Portal extends Thread {
                 Logger.getLogger(Portal.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        s = false;
+        flag = false;
     }
 
     public void draw(GraphicsContext gc) {
