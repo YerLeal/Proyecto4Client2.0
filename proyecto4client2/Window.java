@@ -35,7 +35,7 @@ public class Window extends Application {
     private HBox hBox;
     private Canvas canvasPlayer1, canvasPlayer2;
     private GraphicsContext gc1, gc2;
-    private int playerNumber = 1;
+    private int playerNumber;
     private Button btnAddMother, btnLaunch;
     public static Boolean state1 = false, flag = true;
     private SpaceShip mother;
@@ -44,12 +44,12 @@ public class Window extends Application {
     private int size = 150;
     private ArrayList<SpaceShip> spaceShips;
     private int x , y, mCont = 0, mP = 0;
-    private int xO = 2, yO = 2;
+    private int xO, yO;
     private Label lbName;
     private TextField tfdName;
     private Button btnOk;
     private String namePlayer;
-    private boolean myTurn=true;
+    private boolean myTurn;
 
     private Runnable launch = new Runnable() {
         @Override
@@ -64,13 +64,13 @@ public class Window extends Application {
             missile.start();
             while (flag) {
                 if (portal.getX() - missile.getxI() < 100 && playerNumber == 1 && missile.isAlive() == true && portal.isAlive() == false) {
-                    System.out.println("Entra");
+                    //System.out.println("Entra");
                     portal.start();
                 } else if ((portal.getX() + missile.getxI() < 100 && playerNumber == 2) && missile.isAlive() == true && portal.isAlive() == false) {
                     portal.start();
                 }
                 if ((missile.getxI() == portal.getX() && playerNumber == 1) || (missile.getxI() == portal.getX() + 5 && playerNumber == 2)) {
-                    System.out.println("ENTRA DONDE NO");
+                    //System.out.println("ENTRA DONDE NO");
                     portal.setState(1);
                     portal.setEnd(true);
                 }
@@ -134,7 +134,7 @@ public class Window extends Application {
                             missile.start();
                         }
                         if ((portal.getX() - missile.getxI() > 50 && playerNumber == 1) || (portal.getX() + missile.getxI() > 50 && playerNumber == 2)) {
-                            System.out.println("ENTRA DONDE NO 2");
+                        //    System.out.println("ENTRA DONDE NO 2");
                             portal.setState(1);
                         }
                         auxDraw();
@@ -153,7 +153,7 @@ public class Window extends Application {
                         if ((missile.getxI() >= x && missile.getxI() <= x + size)
                                 && (missile.getyI() >= y && missile.getyI() <= y + size)) {
                             spaceShips.get(i).impact();
-                            System.out.println(x+" "+y);
+                            //System.out.println(x+" "+y);
                             if (spaceShips.get(i).getLife() == 0) {
                                 spaceShips.get(i).start();
                                 while (spaceShips.get(i).getiCont() < 9) {
