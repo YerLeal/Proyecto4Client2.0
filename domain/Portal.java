@@ -9,20 +9,21 @@ import proyecto4client2.Window;
 
 public class Portal extends Thread {
 
-    private int x, y;
+    private int x, y,size;
     private ArrayList<Image> sprites;
     private int imageCount, player;
     private int state = 0;
     private boolean flag = true;
     private boolean end = false;
 
-    public Portal(int x, int y, int player) {
+    public Portal(int x, int y, int player,int size) {
         this.x = x;
         this.y = y;
         this.imageCount = 7;
         this.player = player;
         this.sprites = new ArrayList<>();
         chargeSprites();
+        this.size=size;
     } // constructor
 
     @Override
@@ -89,7 +90,7 @@ public class Portal extends Thread {
         if (this.imageCount < 0) {
             this.imageCount = 3;
         }
-        gc.drawImage(this.sprites.get(this.imageCount), this.x, this.y, 35, 150);
+        gc.drawImage(this.sprites.get(this.imageCount), this.x, this.y, 35, size);
     } // draw
 
 } // end class

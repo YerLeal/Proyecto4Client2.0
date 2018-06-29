@@ -9,12 +9,12 @@ import proyecto4client2.Window;
 
 public class Missile extends Thread {
 
-    private int xI, yI, xF, action;
+    private int xI, yI, xF, action, size;
     private ArrayList<Image> sprites;
     private int iCont, player;
     private boolean end = false, end1 = false;
 
-    public Missile(int xI, int yI, int xF, int player, int action) {
+    public Missile(int xI, int yI, int xF, int player, int action, int size) {
         this.xI = xI;
         this.yI = yI;
         this.xF = xF;
@@ -23,6 +23,7 @@ public class Missile extends Thread {
         this.sprites = new ArrayList<>();
         chargeSprites();
         this.action = action;
+        this.size = size;
     } // constructor
 
     @Override
@@ -82,9 +83,17 @@ public class Missile extends Thread {
         }
 
         if (end1 == true) {
-            gc.drawImage(sprites.get(iCont), xI + 20, yI + 45, 60, 60);
+            if (size == 150) {
+                gc.drawImage(sprites.get(iCont), xI + 30, yI + 45, 60, 60);
+            }else{
+                gc.drawImage(sprites.get(iCont), xI + 25, yI + 15, 40, 40);
+            }
         } else {
-            gc.drawImage(sprites.get(iCont), xI, yI + 65, 60, 20);
+            if (size == 150) {
+                gc.drawImage(sprites.get(iCont), xI + 20, yI + 65, 60, 20);
+            } else {
+                gc.drawImage(sprites.get(iCont), xI, yI + 35, 40, 20);
+            }
         }
     } // draw
 
