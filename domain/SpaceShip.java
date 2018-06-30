@@ -64,6 +64,10 @@ public class SpaceShip extends Thread {
         return this.imageCount;
     } // getImageCount
 
+    public int getType() {
+        return type;
+    }
+
     @Override
     public void run() {
         while (this.imageCount<9) {

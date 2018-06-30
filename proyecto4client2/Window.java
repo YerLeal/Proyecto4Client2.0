@@ -479,11 +479,10 @@ public class Window extends Application {
             for (int j = 0; j < rc; j++) {
                 if ((xMouse >= i * size && xMouse <= i * size + size)
                         && (yMouse >= j * size && yMouse <= j * size + size)) {
-                    System.out.println("XY: "+i+" "+j);
                     if (type == 1) {
-                        mother = new SpaceShip(i, j, size, 2, 1, playerNumber);
+                        
                         if (mCont > 0) {
-                            mP = spaceShips.size();
+                            mother = new SpaceShip(i, j, size, 2, 1, playerNumber);
                             spaceShips.add(mother);
                             mCont--;
                         }
@@ -509,12 +508,13 @@ public class Window extends Application {
             int y = spaceShips.get(i).getY() * size;
             if ((xClick >= x && xClick <= x + size)
                     && (yClick >= y && yClick <= y + size)) {
-                if (i == mP) {
+                if (spaceShips.get(i).getType()==1) {
                     mCont++;
                     spaceShips.remove(i);
                 } else {
                     minions++;
                     spaceShips.remove(i);
+                    
                 }
                 if (playerNumber == 1) {
                     draw(gc1);
@@ -547,8 +547,6 @@ public class Window extends Application {
             int ye = spaceShips.get(i).getY() * size;
             if ((missile.getxI() >= xe && missile.getxI() <= xe + size)
                     && (missile.getyI() >= ye && missile.getyI() <= ye + size)) {
-                
-                System.out.println("Impact"+missile.getxI() + " "+missile.getyI());
                 spaceShips.get(i).impact();
                 if (spaceShips.get(i).getLife() == 0) {
                     spaceShips.get(i).start();
