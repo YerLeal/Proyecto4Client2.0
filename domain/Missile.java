@@ -16,7 +16,7 @@ public class Missile extends Thread {
 
     public Missile(int xI, int yI, int xF, int player, int action, int size) {
         this.xI = xI;
-        this.yI = yI;
+        this.yI = yI+1;
         this.xF = xF;
         this.iCont = 0;
         this.player = player;

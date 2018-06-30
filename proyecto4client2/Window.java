@@ -33,7 +33,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javax.swing.JOptionPane;
 import utilities.Constants;
 
 public class Window extends Application {
@@ -58,7 +57,6 @@ public class Window extends Application {
     private TextField tfdName, tfdMessage;
     private String namePlayer;
     private ComboBox<String> cbxType;
-    private Text positions[][];
     private Runnable chatThread = new Runnable() {
         @Override
         public void run() {
@@ -84,7 +82,7 @@ public class Window extends Application {
     private Runnable launch = new Runnable() {
         @Override
         public void run() {
-            System.out.println("Launch");
+            btnLaunch.setDisable(true);
             if (playerNumber == 1) {
                 missile = new Missile(mother.getX() * size, mother.getY() * size, 450, playerNumber, size, size);
                 portal = new Portal(420, mother.getY() * size, 1, size);
@@ -177,10 +175,12 @@ public class Window extends Application {
 
                     auxDraw();
                     myTurn = true;
+                    btnLaunch.setDisable(false);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
         }
     };
 
@@ -479,6 +479,7 @@ public class Window extends Application {
             for (int j = 0; j < rc; j++) {
                 if ((xMouse >= i * size && xMouse <= i * size + size)
                         && (yMouse >= j * size && yMouse <= j * size + size)) {
+                    System.out.println("XY: "+i+" "+j);
                     if (type == 1) {
                         mother = new SpaceShip(i, j, size, 2, 1, playerNumber);
                         if (mCont > 0) {
@@ -542,10 +543,12 @@ public class Window extends Application {
 
     public void isImpact() {
         for (int i = 0; i < spaceShips.size(); i++) {
-            int x = spaceShips.get(i).getX() * size;
-            int y = spaceShips.get(i).getY() * size;
-            if ((missile.getxI() >= x && missile.getxI() <= x + size)
-                    && (missile.getyI() >= y && missile.getyI() <= y + size)) {
+            int xe = spaceShips.get(i).getX() * size;
+            int ye = spaceShips.get(i).getY() * size;
+            if ((missile.getxI() >= xe && missile.getxI() <= xe + size)
+                    && (missile.getyI() >= ye && missile.getyI() <= ye + size)) {
+                
+                System.out.println("Impact"+missile.getxI() + " "+missile.getyI());
                 spaceShips.get(i).impact();
                 if (spaceShips.get(i).getLife() == 0) {
                     spaceShips.get(i).start();
