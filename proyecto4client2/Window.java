@@ -30,7 +30,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import utilities.Constants;
@@ -55,7 +54,7 @@ public class Window extends Application {
     private Label lbName;
     private TextArea chat;
     private TextField tfdName, tfdMessage;
-    private String namePlayer;
+    private String namePlayer, tamannoDeMatriz = "";
     private ComboBox<String> cbxType;
     private Runnable chatThread = new Runnable() {
         @Override
@@ -321,7 +320,7 @@ public class Window extends Application {
                 sendName();
                 bottonPane.getChildren().clear();
                 bottonPane.getChildren().addAll(btnSetMother, btnSetMinions, btnSetFinish);
-                if (cbxType.getValue().equals("3X3")) {
+                if (tamannoDeMatriz.equals("3X3")) {
                     rc = 3;
                     minions = 2;
                     size = 150;
@@ -401,10 +400,18 @@ public class Window extends Application {
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
             DataInputStream dis = new DataInputStream(socket.getInputStream());
             dos.writeUTF("log&" + namePlayer);
-            String m = dis.readUTF();
-            System.out.println(m);
-            playerNumber = Integer.parseInt(m);
+            String numeroDeJugadorEnviadoPorServer = dis.readUTF();
+            System.out.println(numeroDeJugadorEnviadoPorServer);
+            playerNumber = Integer.parseInt(numeroDeJugadorEnviadoPorServer);
             myTurn = playerNumber == 1;
+            if(playerNumber==1){
+                // envio tamanno
+                tamannoDeMatriz = cbxType.getValue();
+                dos.writeUTF(tamannoDeMatriz);
+            }else{
+                // recibo tamanno
+                tamannoDeMatriz = dis.readUTF();
+            }
             dos.close();
             dis.close();
             socket.close();
