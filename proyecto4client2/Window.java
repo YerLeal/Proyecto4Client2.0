@@ -571,6 +571,7 @@ public class Window extends Application {
                     }
                     if(spaceShips.get(i).getType()==1){
                         try {
+                            spaceShips.remove(i);
                             Socket endSocket=new Socket(Constants.address, Constants.socketPortNumber);
                             DataOutputStream dat=new DataOutputStream(endSocket.getOutputStream());
                             dat.writeUTF("end&"+playerNumber);
@@ -579,6 +580,8 @@ public class Window extends Application {
                         } catch (IOException ex) {
                             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                    }else{
+                        spaceShips.remove(i);
                     }
                     
                 }
