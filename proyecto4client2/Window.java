@@ -134,7 +134,7 @@ public class Window extends Application {
                     DataInputStream data = new DataInputStream(entrada.getInputStream());
                     String datos[] = data.readUTF().split("&");
                     if (datos[0].equalsIgnoreCase("end")) {
-
+                        System.out.println("Ganó");
                     } else {
                         x = Integer.parseInt(datos[0]);
                         y = Integer.parseInt(datos[1]);
@@ -170,16 +170,16 @@ public class Window extends Application {
                             }
                         }
                         isImpact();
+                        auxDraw();
+                        myTurn = true;
+                        btnLaunch.setDisable(false);
                     }
 
-                    auxDraw();
-                    myTurn = true;
-                    btnLaunch.setDisable(false);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
     };
 
@@ -347,9 +347,9 @@ public class Window extends Application {
     };
 
     public void fillPositions() {
-        if(playerNumber==1){
+        if (playerNumber == 1) {
             gc2.setFill(Color.GREENYELLOW);
-        }else{
+        } else {
             gc1.setFill(Color.GREENYELLOW);
         }
         for (int i = 0; i < rc; i++) {
@@ -357,37 +357,41 @@ public class Window extends Application {
 
                 switch (i) {
                     case 0:
-                        if(playerNumber==1){
-                            gc2.fillText("A"+j,i * size + size / 2, j * size + size / 2);
-                        }else{
-                            gc1.fillText("A"+j,i * size + size / 2, j * size + size / 2);
+                        if (playerNumber == 1) {
+                            gc2.fillText("A" + j, i * size + size / 2, j * size + size / 2);
+                        } else {
+                            gc1.fillText("A" + j, i * size + size / 2, j * size + size / 2);
                         }
-                        
+
                         break;
                     case 1:
-                        if(playerNumber==1){
-                            gc2.fillText("B"+j,i * size + size / 2, j * size + size / 2);
-                        }else{
-                            gc1.fillText("B"+j,i * size + size / 2, j * size + size / 2);
-                        }break;
+                        if (playerNumber == 1) {
+                            gc2.fillText("B" + j, i * size + size / 2, j * size + size / 2);
+                        } else {
+                            gc1.fillText("B" + j, i * size + size / 2, j * size + size / 2);
+                        }
+                        break;
                     case 2:
-                        if(playerNumber==1){
-                            gc2.fillText("C"+j,i * size + size / 2, j * size + size / 2);
-                        }else{
-                            gc1.fillText("C"+j,i * size + size / 2, j * size + size / 2);
-                        }break;
+                        if (playerNumber == 1) {
+                            gc2.fillText("C" + j, i * size + size / 2, j * size + size / 2);
+                        } else {
+                            gc1.fillText("C" + j, i * size + size / 2, j * size + size / 2);
+                        }
+                        break;
                     case 3:
-                        if(playerNumber==1){
-                            gc2.fillText("D"+j,i * size + size / 2, j * size + size / 2);
-                        }else{
-                            gc1.fillText("D"+j,i * size + size / 2, j * size + size / 2);
-                        }break;
+                        if (playerNumber == 1) {
+                            gc2.fillText("D" + j, i * size + size / 2, j * size + size / 2);
+                        } else {
+                            gc1.fillText("D" + j, i * size + size / 2, j * size + size / 2);
+                        }
+                        break;
                     case 4:
-                        if(playerNumber==1){
-                            gc2.fillText("E"+j,i * size + size / 2, j * size + size / 2);
-                        }else{
-                            gc1.fillText("E"+j,i * size + size / 2, j * size + size / 2);
-                        }break;
+                        if (playerNumber == 1) {
+                            gc2.fillText("E" + j, i * size + size / 2, j * size + size / 2);
+                        } else {
+                            gc1.fillText("E" + j, i * size + size / 2, j * size + size / 2);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -406,11 +410,11 @@ public class Window extends Application {
             System.out.println(numeroDeJugadorEnviadoPorServer);
             playerNumber = Integer.parseInt(numeroDeJugadorEnviadoPorServer);
             myTurn = playerNumber == 1;
-            if(playerNumber==1){
+            if (playerNumber == 1) {
                 // envio tamanno
                 tamannoDeMatriz = cbxType.getValue();
                 dos.writeUTF(tamannoDeMatriz);
-            }else{
+            } else {
                 // recibo tamanno
                 tamannoDeMatriz = dis.readUTF();
             }
@@ -489,7 +493,7 @@ public class Window extends Application {
                 if ((xMouse >= i * size && xMouse <= i * size + size)
                         && (yMouse >= j * size && yMouse <= j * size + size)) {
                     if (type == 1) {
-                        
+
                         if (mCont > 0) {
                             mother = new SpaceShip(i, j, size, 2, 1, playerNumber);
                             spaceShips.add(mother);
@@ -517,13 +521,13 @@ public class Window extends Application {
             int y = spaceShips.get(i).getY() * size;
             if ((xClick >= x && xClick <= x + size)
                     && (yClick >= y && yClick <= y + size)) {
-                if (spaceShips.get(i).getType()==1) {
+                if (spaceShips.get(i).getType() == 1) {
                     mCont++;
                     spaceShips.remove(i);
                 } else {
                     minions++;
                     spaceShips.remove(i);
-                    
+
                 }
                 if (playerNumber == 1) {
                     draw(gc1);
@@ -569,21 +573,22 @@ public class Window extends Application {
                                     .getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    if(spaceShips.get(i).getType()==1){
+                    if (spaceShips.get(i).getType() == 1) {
                         try {
                             spaceShips.remove(i);
-                            Socket endSocket=new Socket(Constants.address, Constants.socketPortNumber);
-                            DataOutputStream dat=new DataOutputStream(endSocket.getOutputStream());
-                            dat.writeUTF("end&"+playerNumber);
+                            Socket endSocket = new Socket(Constants.address, Constants.socketPortNumber);
+                            DataOutputStream dat = new DataOutputStream(endSocket.getOutputStream());
+                            dat.writeUTF("end&" + playerNumber);
                             dat.close();
                             endSocket.close();
+                            System.out.println("Perdió");
                         } catch (IOException ex) {
                             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    }else{
+                    } else {
                         spaceShips.remove(i);
                     }
-                    
+
                 }
                 break;
             }
