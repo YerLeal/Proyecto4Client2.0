@@ -50,7 +50,7 @@ public class Window extends Application {
     private Missile missile;
     private Portal portal;
     private ArrayList<SpaceShip> spaceShips;
-    private int x, y, xO, yO, mCont = 1, mP = 0, playerNumber = -1, size = 150, rc, minions;
+    private int x, y, xO, yO, mCont = 1, playerNumber = -1, size = 150, rc, minions;
     private Label lbName;
     private TextArea chat;
     private TextField tfdName, tfdMessage;
@@ -193,7 +193,7 @@ public class Window extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Jueguito");
+        primaryStage.setTitle("SpaceShip Wars");
         initComponents(primaryStage);
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -201,6 +201,8 @@ public class Window extends Application {
                 System.exit(0);
             }
         });
+//        Stage score=new Stage();
+//        score.show();
         primaryStage.resizableProperty().set(false);
         primaryStage.show();
         new Thread(this.recieve).start();
@@ -567,7 +569,18 @@ public class Window extends Application {
                                     .getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    spaceShips.remove(i);
+                    if(spaceShips.get(i).getType()==1){
+                        try {
+                            Socket endSocket=new Socket(Constants.address, Constants.socketPortNumber);
+                            DataOutputStream dat=new DataOutputStream(endSocket.getOutputStream());
+                            dat.writeUTF("end&"+playerNumber);
+                            dat.close();
+                            endSocket.close();
+                        } catch (IOException ex) {
+                            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    
                 }
                 break;
             }
