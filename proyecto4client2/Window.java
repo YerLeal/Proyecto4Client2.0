@@ -567,7 +567,7 @@ public class Window extends Application {
             int xe = spaceShips.get(i).getX() * size;
             int ye = spaceShips.get(i).getY() * size;
             if ((missile.getxI() >= xe && missile.getxI() <= xe + size)
-                    && (missile.getyI() >= ye && missile.getyI() <= ye + size)) {
+                    && (missile.getyI() >= ye && missile.getyI() <= ye + size-1)) {
                 spaceShips.get(i).impact();
                 if(spaceShips.get(i).getType()==1){
                     if(tamannoDeMatriz.equals("3X3")){
@@ -599,7 +599,7 @@ public class Window extends Application {
                             dat.close();
                             endSocket.close();
                             System.out.println("Perdió");
-                            score();
+                            //score();
                         } catch (IOException ex) {
                             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -610,6 +610,7 @@ public class Window extends Application {
                 break;
             } // if ((missile.getxI() >= xe && missile.getxI() <= xe + ...
         } // for (int i = 0; i < spaceShips.size(); i++)
+        
     } // isImpact
     
     private void score(){
