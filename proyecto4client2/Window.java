@@ -2,10 +2,12 @@ package proyecto4client2;
 
 import domain.Missile;
 import domain.Portal;
+import domain.Score;
 import domain.SpaceShip;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -32,6 +34,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import utilities.Constants;
 
 public class Window extends Application {
@@ -55,7 +63,9 @@ public class Window extends Application {
     private TextArea chat;
     private TextField tfdName, tfdMessage;
     private String namePlayer, tamannoDeMatriz = "";
+    private int enemyScore = 0;
     private ComboBox<String> cbxType;
+    
     private Runnable chatThread = new Runnable() {
         @Override
         public void run() {
@@ -135,6 +145,7 @@ public class Window extends Application {
                     String datos[] = data.readUTF().split("&");
                     if (datos[0].equalsIgnoreCase("end")) {
                         System.out.println("Ganó");
+                        score();
                     } else {
                         x = Integer.parseInt(datos[0]);
                         y = Integer.parseInt(datos[1]);
@@ -174,7 +185,6 @@ public class Window extends Application {
                         myTurn = true;
                         btnLaunch.setDisable(false);
                     }
-
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
@@ -201,8 +211,6 @@ public class Window extends Application {
                 System.exit(0);
             }
         });
-//        Stage score=new Stage();
-//        score.show();
         primaryStage.resizableProperty().set(false);
         primaryStage.show();
         new Thread(this.recieve).start();
@@ -397,7 +405,7 @@ public class Window extends Application {
                 }
             }
         }
-    }
+    } // fillPositions
 
     public void sendName() {
         try {
@@ -424,7 +432,7 @@ public class Window extends Application {
         } catch (IOException ex) {
             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    } // sendName
 
     public void sendMessage() {
         chat.setStyle("-fx-text-inner-color: blue;");
@@ -441,7 +449,7 @@ public class Window extends Application {
         }
         tfdMessage.clear();
 
-    }
+    } // sendMessage
 
     public static void main(String[] args) {
         launch(args);
@@ -513,7 +521,7 @@ public class Window extends Application {
                 }
             }
         }
-    }
+    } // setSpaceShip
 
     public void deleteSpaceShip(double yClick, double xClick) {
         for (int i = 0; i < spaceShips.size(); i++) {
@@ -537,7 +545,7 @@ public class Window extends Application {
                 break;
             }
         }
-    }
+    } // deleteSpaceShip
 
     private void selectEnemyPosition(double x, double y) {
         double xMouse = x;
@@ -552,7 +560,7 @@ public class Window extends Application {
                 }
             }
         }
-    }
+    } // selectEnemyPosition
 
     public void isImpact() {
         for (int i = 0; i < spaceShips.size(); i++) {
@@ -561,18 +569,27 @@ public class Window extends Application {
             if ((missile.getxI() >= xe && missile.getxI() <= xe + size)
                     && (missile.getyI() >= ye && missile.getyI() <= ye + size)) {
                 spaceShips.get(i).impact();
+                if(spaceShips.get(i).getType()==1){
+                    if(tamannoDeMatriz.equals("3X3")){
+                        enemyScore += 250;
+                    }else{
+                        enemyScore += 500;
+                    }
+                }else{
+                    enemyScore += 250;
+                }
+                System.out.println("Score: "+ enemyScore);
                 if (spaceShips.get(i).getLife() == 0) {
                     spaceShips.get(i).start();
                     while (spaceShips.get(i).getImageCount() < 9) {
                         try {
                             auxDraw();
                             Thread.sleep(50);
-
                         } catch (InterruptedException ex) {
                             Logger.getLogger(Window.class
                                     .getName()).log(Level.SEVERE, null, ex);
                         }
-                    }
+                    } // while
                     if (spaceShips.get(i).getType() == 1) {
                         try {
                             spaceShips.remove(i);
@@ -582,17 +599,69 @@ public class Window extends Application {
                             dat.close();
                             endSocket.close();
                             System.out.println("Perdió");
+                            score();
                         } catch (IOException ex) {
                             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     } else {
                         spaceShips.remove(i);
                     }
-
-                }
+                } // if (spaceShips.get(i).getLife() == 0)
                 break;
+            } // if ((missile.getxI() >= xe && missile.getxI() <= xe + ...
+        } // for (int i = 0; i < spaceShips.size(); i++)
+    } // isImpact
+    
+    private void score(){
+        try {
+            Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
+            DataOutputStream send = new DataOutputStream(socket.getOutputStream());
+            DataInputStream receive = new DataInputStream(socket.getInputStream());
+            send.writeUTF("score&"+fromScoreToString(new Score(namePlayer, enemyScore)));
+            int cantidadScore = Integer.parseInt(receive.readUTF());// recibo la cantidad de Score
+            ArrayList<Score> allScores = new ArrayList<Score>();
+            for(int i=0; i<cantidadScore; i++){
+                allScores.add(fromElementToScore(fromStringToElement(receive.readUTF())));
             }
+            send.close();
+            receive.close();
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    } // score
+    
+    private Score fromElementToScore(Element eScore) {
+        Score score = new Score();
+        score.setName(eScore.getAttributeValue("name"));
+        score.setScore(Integer.parseInt(eScore.getChildText("score")));
+        return score;
+    } // fromElementToScore
+
+    private Element fromStringToElement(String scoreString) {
+        try {
+            SAXBuilder saxBuilder = new SAXBuilder();
+            StringReader stringReader = new StringReader(scoreString);
+            Document doc = saxBuilder.build(stringReader);
+            Element eScore = doc.getRootElement();
+            return eScore;
+        } catch (JDOMException | IOException ex) {
+            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    } // fromStringToElement
+
+    private String fromScoreToString(Score score) {
+        Element eScore = new Element("score");
+        Element eScor = new Element("scor");
+        eScore.setAttribute("name", score.getName());
+        eScor.addContent(String.valueOf(score.getScore()));
+        eScore.addContent(eScor);
+        XMLOutputter output = new XMLOutputter(Format.getCompactFormat());
+        String xmlStringElementEStudent = output.outputString(eScore);
+        xmlStringElementEStudent = xmlStringElementEStudent.replace("\n", "");
+        return xmlStringElementEStudent;
+    } // fromStudentToString
+    
 
 } // end class
