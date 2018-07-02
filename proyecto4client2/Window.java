@@ -562,7 +562,7 @@ public class Window extends Application {
         }
     } // selectEnemyPosition
 
-    public void isImpact() {
+    public void isImpact() {   
         for (int i = 0; i < spaceShips.size(); i++) {
             int xe = spaceShips.get(i).getX() * size;
             int ye = spaceShips.get(i).getY() * size;
@@ -663,5 +663,4 @@ public class Window extends Application {
         return xmlStringElementEStudent;
     } // fromStudentToString
     
-
 } // end class
