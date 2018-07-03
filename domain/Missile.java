@@ -45,7 +45,7 @@ public class Missile extends Thread {
             end1 = true;
             iCont = 4;
             try {
-                Thread.sleep(200);
+                Thread.sleep(300);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Missile.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -7,10 +7,11 @@ import domain.SpaceShip;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -24,8 +25,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -34,12 +38,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import utilities.Constants;
 
 public class Window extends Application {
@@ -51,21 +49,22 @@ public class Window extends Application {
     private HBox canvasBox;
     private Canvas canvasPlayer1, canvasPlayer2, backGroundCanvas;
     private GraphicsContext gc1, gc2;
-    private Button btnSetMother, btnSetMinions, btnLaunch, btnSendName, btnSendMessage, btnSetFinish;
+    private Button btnSetMother, btnSetMinions, btnLaunch, btnSendName, btnSendMessage, btnSetFinish,btnScore;
     public static Boolean motherActive = false, minionActive = false, flag = true;
     private boolean myTurn;
     private SpaceShip mother;
     private Missile missile;
     private Portal portal;
     private ArrayList<SpaceShip> spaceShips;
-    private int x, y, xO, yO, mCont = 1, playerNumber = -1, size = 150, rc, minions;
+    private int x, y, xO, yO, mCont = 1, playerNumber = -1, size = 150, rc, minions, difference;
     private Label lbName;
     private TextArea chat;
     private TextField tfdName, tfdMessage;
     private String namePlayer, tamannoDeMatriz = "";
     private int enemyScore = 0;
     private ComboBox<String> cbxType;
-    
+    private TableView<Score> scoreTable;
+
     private Runnable chatThread = new Runnable() {
         @Override
         public void run() {
@@ -155,20 +154,22 @@ public class Window extends Application {
                             portal = portal = new Portal(420, y * size, playerNumber, size);
                             portal.start();
                         } else {
-                            portal = portal = new Portal(0, y * size, playerNumber, size);
+                            portal = portal = new Portal(-5, y * size, playerNumber, size);
                             portal.start();
                         }
                         if (playerNumber == 1) {
                             missile = new Missile(430, y * size, x * size, 2, 1, size);
                         } else {
-                            missile = new Missile(0, y * size, x * size, 1, 1, size);
+                            missile = new Missile(-10, y * size, x * size, 1, 1, size);
                         }
                         missile.setEnd(true);
                         while (flag) {
                             if (portal.getImageCount() == 3 && missile.isAlive() == false) {
                                 missile.start();
                             }
-                            if ((portal.getX() - missile.getxI() > 50 && playerNumber == 1) || (portal.getX() + missile.getxI() > 50 && playerNumber == 2)) {
+                            if ((portal.getX() - missile.getxI() > difference && playerNumber == 1)
+                                    || ((portal.getX() + missile.getxI() > difference) && playerNumber == 2)
+                                    || (x == 0 && missile.getxI() == 0 && playerNumber == 2)) {
                                 portal.setState(1);
                             }
                             auxDraw();
@@ -231,6 +232,7 @@ public class Window extends Application {
         this.btnSendMessage = new Button("Send Message");
         this.btnSetMinions = new Button("SetMinions");
         this.btnSetFinish = new Button("Finish");
+        this.btnScore=new Button("Score");
         //textField-Area
         this.tfdName = new TextField();
         this.tfdMessage = new TextField();
@@ -252,6 +254,7 @@ public class Window extends Application {
         this.btnSendMessage.setOnAction(buttonsEvents);
         this.btnSetMinions.setOnAction(buttonsEvents);
         this.btnSetFinish.setOnAction(buttonsEvents);
+        this.btnScore.setOnAction(buttonsEvents);
         //graphicContext
         this.gc1 = this.canvasPlayer1.getGraphicsContext2D();
         this.gc2 = this.canvasPlayer2.getGraphicsContext2D();
@@ -272,16 +275,16 @@ public class Window extends Application {
         this.btnSetMinions.relocate(120, 30);
         this.btnSetFinish.relocate(220, 30);
         this.btnLaunch.relocate(50, 60);
+        this.btnScore.relocate(300,550);
         //other
         this.spaceShips = new ArrayList<>();
-
         ObservableList<String> list = FXCollections.observableArrayList();
         list.addAll("3X3", "5X5");
         cbxType = new ComboBox<>(list);
         cbxType.relocate(10, 50);
 
         //add
-        chatPane.getChildren().addAll(chat, btnSendMessage, tfdMessage);
+        chatPane.getChildren().addAll(chat, btnSendMessage, tfdMessage,btnScore);
         this.canvasBox.getChildren().addAll(this.canvasPlayer1, this.canvasPlayer2);
         bottonPane.getChildren().addAll(this.lbName, this.tfdName, this.btnSendName, this.cbxType);
 
@@ -334,9 +337,11 @@ public class Window extends Application {
                     rc = 3;
                     minions = 2;
                     size = 150;
+                    difference = 50;
                 } else {
                     rc = 5;
                     size = 90;
+                    difference = 25;
                     minions = 4;
                 }
                 fillPositions();
@@ -350,6 +355,8 @@ public class Window extends Application {
             } else if (event.getSource() == btnSetFinish) {
                 bottonPane.getChildren().clear();
                 bottonPane.getChildren().addAll(btnLaunch);
+            }else{
+                initTable();
             }
         }
     };
@@ -424,6 +431,7 @@ public class Window extends Application {
                 dos.writeUTF(tamannoDeMatriz);
             } else {
                 // recibo tamanno
+//                btnLaunch.setDisable(true);
                 tamannoDeMatriz = dis.readUTF();
             }
             dos.close();
@@ -562,23 +570,22 @@ public class Window extends Application {
         }
     } // selectEnemyPosition
 
-    public void isImpact() {   
+    public void isImpact() {
         for (int i = 0; i < spaceShips.size(); i++) {
             int xe = spaceShips.get(i).getX() * size;
             int ye = spaceShips.get(i).getY() * size;
-            if ((missile.getxI() >= xe && missile.getxI() <= xe + size)
-                    && (missile.getyI() >= ye && missile.getyI() <= ye + size-1)) {
+            if ((missile.getxI() + (size / 2) >= xe && missile.getxI() + (size / 2) <= xe + size)
+                    && (missile.getyI() + (size / 2) >= ye && missile.getyI() + (size / 2) <= ye + size)) {
                 spaceShips.get(i).impact();
-                if(spaceShips.get(i).getType()==1){
-                    if(tamannoDeMatriz.equals("3X3")){
+                if (spaceShips.get(i).getType() == 1) {
+                    if (tamannoDeMatriz.equals("3X3")) {
                         enemyScore += 250;
-                    }else{
+                    } else {
                         enemyScore += 500;
                     }
-                }else{
+                } else {
                     enemyScore += 250;
                 }
-                System.out.println("Score: "+ enemyScore);
                 if (spaceShips.get(i).getLife() == 0) {
                     spaceShips.get(i).start();
                     while (spaceShips.get(i).getImageCount() < 9) {
@@ -598,11 +605,11 @@ public class Window extends Application {
                             dat.writeUTF("end&" + playerNumber);
                             dat.close();
                             endSocket.close();
-                            System.out.println("Perdió");
                             //score();
                         } catch (IOException ex) {
                             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        score();
                     } else {
                         spaceShips.remove(i);
                     }
@@ -610,58 +617,52 @@ public class Window extends Application {
                 break;
             } // if ((missile.getxI() >= xe && missile.getxI() <= xe + ...
         } // for (int i = 0; i < spaceShips.size(); i++)
-        
+
     } // isImpact
-    
-    private void score(){
+
+    private void score() {
         try {
             Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
             DataOutputStream send = new DataOutputStream(socket.getOutputStream());
-            DataInputStream receive = new DataInputStream(socket.getInputStream());
-            send.writeUTF("score&"+fromScoreToString(new Score(namePlayer, enemyScore)));
-            int cantidadScore = Integer.parseInt(receive.readUTF());// recibo la cantidad de Score
-            ArrayList<Score> allScores = new ArrayList<Score>();
-            for(int i=0; i<cantidadScore; i++){
-                allScores.add(fromElementToScore(fromStringToElement(receive.readUTF())));
-            }
+            send.writeUTF("score&"+playerNumber+"&"+enemyScore);
             send.close();
-            receive.close();
             socket.close();
         } catch (IOException ex) {
             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
         }
     } // score
-    
-    private Score fromElementToScore(Element eScore) {
-        Score score = new Score();
-        score.setName(eScore.getAttributeValue("name"));
-        score.setScore(Integer.parseInt(eScore.getChildText("score")));
-        return score;
-    } // fromElementToScore
 
-    private Element fromStringToElement(String scoreString) {
+    public void initTable() {
+        scoreTable = new TableView<>();
+        TableColumn tcName = new TableColumn("Name");
+        TableColumn tcScore = new TableColumn("Score");
+        tcName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        tcScore.setCellValueFactory(new PropertyValueFactory<>("score"));
+        scoreTable.getColumns().addAll(tcName, tcScore);
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            StringReader stringReader = new StringReader(scoreString);
-            Document doc = saxBuilder.build(stringReader);
-            Element eScore = doc.getRootElement();
-            return eScore;
-        } catch (JDOMException | IOException ex) {
+            Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
+            DataOutputStream send = new DataOutputStream(socket.getOutputStream());
+            send.writeUTF("getScore");
+            ObjectInputStream dat = new ObjectInputStream(socket.getInputStream());
+            try {
+                ObservableList<Score> scoreList = FXCollections.observableArrayList((List<Score>) dat.readObject());
+                scoreTable.setItems(scoreList);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            send.close();
+            dat.close();
+            socket.close();
+        } catch (IOException ex) {
             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
-    } // fromStringToElement
+        Pane tablePane=new Pane(scoreTable);
+        Stage tableStage=new Stage();
+        Scene scene1=new Scene(tablePane);
+        tableStage.setScene(scene1);
+        tableStage.setAlwaysOnTop(true);
+        tableStage.show();
+        
+    }
 
-    private String fromScoreToString(Score score) {
-        Element eScore = new Element("score");
-        Element eScor = new Element("scor");
-        eScore.setAttribute("name", score.getName());
-        eScor.addContent(String.valueOf(score.getScore()));
-        eScore.addContent(eScor);
-        XMLOutputter output = new XMLOutputter(Format.getCompactFormat());
-        String xmlStringElementEStudent = output.outputString(eScore);
-        xmlStringElementEStudent = xmlStringElementEStudent.replace("\n", "");
-        return xmlStringElementEStudent;
-    } // fromStudentToString
-    
 } // end class

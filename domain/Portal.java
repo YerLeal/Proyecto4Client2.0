@@ -45,7 +45,7 @@ public class Portal extends Thread {
                 }
             }
 
-        };
+        }
     } // run
 
     public int getX() {
@@ -78,7 +78,7 @@ public class Portal extends Thread {
         while (this.imageCount < 8) {
             this.imageCount++;
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Portal.class.getName()).log(Level.SEVERE, null, ex);
             }

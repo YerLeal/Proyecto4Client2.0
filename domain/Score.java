@@ -1,6 +1,8 @@
 package domain;
 
-public class Score {
+import java.io.Serializable;
+
+public class Score implements Serializable{
 
     private String name;
     private int score;
