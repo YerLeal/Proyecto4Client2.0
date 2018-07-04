@@ -270,8 +270,8 @@ public class Window extends Application {
         chatPane.setPrefSize(450, 700);
         this.chatArea.relocate(75, 0);
         this.chatArea.setPrefSize(300, 450);
-        this.messageArea.relocate(400, 30);
-        this.messageArea.setPrefSize(300, 30);
+        this.messageArea.relocate(400, 20);
+        this.messageArea.setPrefSize(300, 120);
         this.tfdMessage.relocate(120, 480);
         this.btnSendMessage.relocate(300, 480);
         this.bottonPane.setPrefSize(500, 200);
@@ -675,7 +675,7 @@ public class Window extends Application {
         try {
             Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
             DataOutputStream dat = new DataOutputStream(socket.getOutputStream());
-            dat.writeUTF("shot&" + this.playerNumber + "&" + message + "\n");
+            dat.writeUTF("shot&" + this.playerNumber + "&" + message);
             dat.close();
             socket.close();
         } catch (IOException ex) {
