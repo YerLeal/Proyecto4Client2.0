@@ -122,12 +122,9 @@ public class Window extends Application {
             try {
                 Socket client = new Socket(utilities.Constants.address, utilities.Constants.socketPortNumber);
                 DataOutputStream dat = new DataOutputStream(client.getOutputStream());
-
                 dat.writeUTF("attack&" + playerNumber + "&" + xO + "&" + yO);
-
                 dat.close();
                 client.close();
-
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -146,7 +143,7 @@ public class Window extends Application {
                     DataInputStream data = new DataInputStream(entrada.getInputStream());
                     String datos[] = data.readUTF().split("&");
                     if (datos[0].equalsIgnoreCase("end")) {
-                        System.out.println("Ganó");
+                        messageArea.appendText("You win\n");
                         score();
                     } else {
                         x = Integer.parseInt(datos[0]);
@@ -604,6 +601,7 @@ public class Window extends Application {
                     } // while
                     if (this.spaceShips.get(i).getType() == 1) {
                         try {
+                            this.messageArea.appendText("You loss\n");
                             this.spaceShips.remove(i);
                             Socket endSocket = new Socket(Constants.address, Constants.socketPortNumber);
                             DataOutputStream dat = new DataOutputStream(endSocket.getOutputStream());
