@@ -11,14 +11,14 @@ public class Missile extends Thread {
 
     private int xI, yI, xF, action, size;
     private ArrayList<Image> sprites;
-    private int iCont, player;
+    private int imageCount, player;
     private boolean end = false, end1 = false;
 
     public Missile(int xI, int yI, int xF, int player, int action, int size) {
         this.xI = xI;
-        this.yI = yI+1;
+        this.yI = yI + 1;
         this.xF = xF;
-        this.iCont = 0;
+        this.imageCount = 0;
         this.player = player;
         this.sprites = new ArrayList<>();
         chargeSprites();
@@ -34,7 +34,7 @@ public class Missile extends Thread {
             } else {
                 xI -= 10;
             }
-            iCont++;
+            imageCount++;
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
@@ -43,7 +43,7 @@ public class Missile extends Thread {
         }
         if (action == 1) {
             end1 = true;
-            iCont = 4;
+            imageCount = 4;
             try {
                 Thread.sleep(300);
             } catch (InterruptedException ex) {
@@ -59,7 +59,7 @@ public class Missile extends Thread {
         this.end = end;
     }
 
-    public void chargeSprites() {
+    private void chargeSprites() {
         for (int i = 0; i < 5; i++) {
             if (player == 1) {
                 this.sprites.add(new Image("/assets/mu" + i + ".png"));
@@ -78,21 +78,21 @@ public class Missile extends Thread {
     }
 
     public void draw(GraphicsContext gc) {
-        if (iCont > 3 && end1 != true) {
-            iCont = 0;
+        if (imageCount > 3 && end1 != true) {
+            imageCount = 0;
         }
 
         if (end1 == true) {
             if (size == 150) {
-                gc.drawImage(sprites.get(iCont), xI + 30, yI + 45, 60, 60);
-            }else{
-                gc.drawImage(sprites.get(iCont), xI + 25, yI + 15, 40, 40);
+                gc.drawImage(sprites.get(imageCount), xI + 30, yI + 45, 60, 60);
+            } else {
+                gc.drawImage(sprites.get(imageCount), xI + 25, yI + 15, 40, 40);
             }
         } else {
             if (size == 150) {
-                gc.drawImage(sprites.get(iCont), xI + 20, yI + 65, 60, 20);
+                gc.drawImage(sprites.get(imageCount), xI + 20, yI + 65, 60, 20);
             } else {
-                gc.drawImage(sprites.get(iCont), xI, yI + 35, 40, 20);
+                gc.drawImage(sprites.get(imageCount), xI, yI + 35, 40, 20);
             }
         }
     } // draw

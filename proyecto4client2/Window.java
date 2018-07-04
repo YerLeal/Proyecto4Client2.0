@@ -49,7 +49,7 @@ public class Window extends Application {
     private HBox canvasBox;
     private Canvas canvasPlayer1, canvasPlayer2, backGroundCanvas;
     private GraphicsContext gc1, gc2;
-    private Button btnSetMother, btnSetMinions, btnLaunch, btnSendName, btnSendMessage, btnSetFinish,btnScore;
+    private Button btnSetMother, btnSetMinions, btnLaunch, btnSendName, btnSendMessage, btnSetFinish, btnScore;
     public static Boolean motherActive = false, minionActive = false, flag = true;
     private boolean myTurn;
     private SpaceShip mother;
@@ -60,7 +60,7 @@ public class Window extends Application {
     private Label lbName;
     private TextArea chat;
     private TextField tfdName, tfdMessage;
-    private String namePlayer, tamannoDeMatriz = "";
+    private String namePlayer, matrixSize = "";
     private int enemyScore = 0;
     private ComboBox<String> cbxType;
     private TableView<Score> scoreTable;
@@ -79,11 +79,9 @@ public class Window extends Application {
                     recieve.close();
                     chatConnection.close();
                 }
-
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
     };
 
@@ -219,20 +217,19 @@ public class Window extends Application {
     } // start
 
     private void initComponents(Stage primaryStage) {
-        backGroundCanvas = new Canvas(WIDTH, HEIGHT);
-        backGroundCanvas.getGraphicsContext2D().drawImage(new Image("assets/background.jpg"), 0, 0, WIDTH, HEIGHT);
+        this.backGroundCanvas = new Canvas(WIDTH, HEIGHT);
+        this.backGroundCanvas.getGraphicsContext2D().drawImage(new Image("assets/background.jpg"), 0, 0, WIDTH, HEIGHT);
+        
         //Labels
         this.lbName = new Label("Name: ");
-
         //buttons
         this.btnSendName = new Button("Send Name");
         this.btnSetMother = new Button("Set Mother");
         this.btnLaunch = new Button("Launch");
-        this.btnSendName.setOnAction(buttonsEvents);
         this.btnSendMessage = new Button("Send Message");
         this.btnSetMinions = new Button("SetMinions");
         this.btnSetFinish = new Button("Finish");
-        this.btnScore=new Button("Score");
+        this.btnScore = new Button("Score");
         //textField-Area
         this.tfdName = new TextField();
         this.tfdMessage = new TextField();
@@ -244,17 +241,18 @@ public class Window extends Application {
         this.canvasPlayer1 = new Canvas(450, 450);
         this.canvasPlayer2 = new Canvas(450, 450);
         Pane chatPane = new Pane();
-        bottonPane = new Pane();
+        this.bottonPane = new Pane();
 
         //setEvents
         this.canvasPlayer1.setOnMouseClicked(this.canvasEvents);
         this.canvasPlayer2.setOnMouseClicked(this.canvasEvents);
-        this.btnSetMother.setOnAction(buttonsEvents);
-        this.btnLaunch.setOnAction(buttonsEvents);
-        this.btnSendMessage.setOnAction(buttonsEvents);
-        this.btnSetMinions.setOnAction(buttonsEvents);
-        this.btnSetFinish.setOnAction(buttonsEvents);
-        this.btnScore.setOnAction(buttonsEvents);
+        this.btnSendName.setOnAction(this.buttonsEvents);
+        this.btnSetMother.setOnAction(this.buttonsEvents);
+        this.btnLaunch.setOnAction(this.buttonsEvents);
+        this.btnSendMessage.setOnAction(this.buttonsEvents);
+        this.btnSetMinions.setOnAction(this.buttonsEvents);
+        this.btnSetFinish.setOnAction(this.buttonsEvents);
+        this.btnScore.setOnAction(this.buttonsEvents);
         //graphicContext
         this.gc1 = this.canvasPlayer1.getGraphicsContext2D();
         this.gc2 = this.canvasPlayer2.getGraphicsContext2D();
@@ -266,7 +264,7 @@ public class Window extends Application {
         this.chat.setPrefSize(300, 450);
         this.tfdMessage.relocate(120, 480);
         this.btnSendMessage.relocate(300, 480);
-        bottonPane.setPrefSize(500, 200);
+        this.bottonPane.setPrefSize(500, 200);
         this.lbName.relocate(10, 20);
         this.tfdName.relocate(60, 20);
         this.tfdName.setPrefWidth(80);
@@ -275,26 +273,26 @@ public class Window extends Application {
         this.btnSetMinions.relocate(120, 30);
         this.btnSetFinish.relocate(220, 30);
         this.btnLaunch.relocate(50, 60);
-        this.btnScore.relocate(300,550);
+        this.btnScore.relocate(300, 550);
         //other
         this.spaceShips = new ArrayList<>();
         ObservableList<String> list = FXCollections.observableArrayList();
         list.addAll("3X3", "5X5");
-        cbxType = new ComboBox<>(list);
-        cbxType.relocate(10, 50);
+        this.cbxType = new ComboBox<>(list);
+        this.cbxType.relocate(10, 50);
 
         //add
-        chatPane.getChildren().addAll(chat, btnSendMessage, tfdMessage,btnScore);
+        chatPane.getChildren().addAll(this.chat, this.btnSendMessage, this.tfdMessage, this.btnScore);
         this.canvasBox.getChildren().addAll(this.canvasPlayer1, this.canvasPlayer2);
-        bottonPane.getChildren().addAll(this.lbName, this.tfdName, this.btnSendName, this.cbxType);
+        this.bottonPane.getChildren().addAll(this.lbName, this.tfdName, this.btnSendName, this.cbxType);
 
         this.canvasBox.relocate(0, 0);
-        bottonPane.relocate(0, 450);
+        this.bottonPane.relocate(0, 450);
         chatPane.relocate(900, 0);
 
-        principalPane.getChildren().addAll(backGroundCanvas, bottonPane, chatPane, canvasBox);
+        this.principalPane.getChildren().addAll(this.backGroundCanvas, this.bottonPane, chatPane, this.canvasBox);
         this.scene = new Scene(this.principalPane, WIDTH, HEIGHT);
-        primaryStage.setScene(scene);
+        primaryStage.setScene(this.scene);
     } // init
 
     EventHandler<MouseEvent> canvasEvents = new EventHandler<MouseEvent>() {
@@ -333,7 +331,7 @@ public class Window extends Application {
                 sendName();
                 bottonPane.getChildren().clear();
                 bottonPane.getChildren().addAll(btnSetMother, btnSetMinions, btnSetFinish);
-                if (tamannoDeMatriz.equals("3X3")) {
+                if (matrixSize.equals("3X3")) {
                     rc = 3;
                     minions = 2;
                     size = 150;
@@ -355,84 +353,80 @@ public class Window extends Application {
             } else if (event.getSource() == btnSetFinish) {
                 bottonPane.getChildren().clear();
                 bottonPane.getChildren().addAll(btnLaunch);
-            }else{
+            } else {
                 initTable();
             }
         }
     };
 
     public void fillPositions() {
-        if (playerNumber == 1) {
-            gc2.setFill(Color.GREENYELLOW);
+        if (this.playerNumber == 1) {
+            this.gc2.setFill(Color.GREENYELLOW);
         } else {
-            gc1.setFill(Color.GREENYELLOW);
+            this.gc1.setFill(Color.GREENYELLOW);
         }
-        for (int i = 0; i < rc; i++) {
-            for (int j = 0; j < rc; j++) {
-
+        for (int i = 0; i < this.rc; i++) {
+            for (int j = 0; j < this.rc; j++) {
                 switch (i) {
                     case 0:
-                        if (playerNumber == 1) {
-                            gc2.fillText("A" + j, i * size + size / 2, j * size + size / 2);
+                        if (this.playerNumber == 1) {
+                            this.gc2.fillText("A" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         } else {
-                            gc1.fillText("A" + j, i * size + size / 2, j * size + size / 2);
+                            this.gc1.fillText("A" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         }
-
                         break;
                     case 1:
-                        if (playerNumber == 1) {
-                            gc2.fillText("B" + j, i * size + size / 2, j * size + size / 2);
+                        if (this.playerNumber == 1) {
+                            this.gc2.fillText("B" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         } else {
-                            gc1.fillText("B" + j, i * size + size / 2, j * size + size / 2);
+                            this.gc1.fillText("B" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         }
                         break;
                     case 2:
-                        if (playerNumber == 1) {
-                            gc2.fillText("C" + j, i * size + size / 2, j * size + size / 2);
+                        if (this.playerNumber == 1) {
+                            this.gc2.fillText("C" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         } else {
-                            gc1.fillText("C" + j, i * size + size / 2, j * size + size / 2);
+                            this.gc1.fillText("C" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         }
                         break;
                     case 3:
-                        if (playerNumber == 1) {
-                            gc2.fillText("D" + j, i * size + size / 2, j * size + size / 2);
+                        if (this.playerNumber == 1) {
+                            this.gc2.fillText("D" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         } else {
-                            gc1.fillText("D" + j, i * size + size / 2, j * size + size / 2);
+                            this.gc1.fillText("D" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         }
                         break;
                     case 4:
-                        if (playerNumber == 1) {
-                            gc2.fillText("E" + j, i * size + size / 2, j * size + size / 2);
+                        if (this.playerNumber == 1) {
+                            this.gc2.fillText("E" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         } else {
-                            gc1.fillText("E" + j, i * size + size / 2, j * size + size / 2);
+                            this.gc1.fillText("E" + j, i * this.size + this.size / 2, j * this.size + this.size / 2);
                         }
                         break;
                     default:
                         break;
-                }
-            }
-        }
+                } // switch
+            } // for j
+        } // for i
     } // fillPositions
 
     public void sendName() {
         try {
-            namePlayer = tfdName.getText();
+            this.namePlayer = this.tfdName.getText();
             Socket socket = new Socket(utilities.Constants.address, utilities.Constants.socketPortNumber);
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
             DataInputStream dis = new DataInputStream(socket.getInputStream());
-            dos.writeUTF("log&" + namePlayer);
+            dos.writeUTF("log&" + this.namePlayer);
             String numeroDeJugadorEnviadoPorServer = dis.readUTF();
-            System.out.println(numeroDeJugadorEnviadoPorServer);
-            playerNumber = Integer.parseInt(numeroDeJugadorEnviadoPorServer);
-            myTurn = playerNumber == 1;
-            if (playerNumber == 1) {
-                // envio tamanno
-                tamannoDeMatriz = cbxType.getValue();
-                dos.writeUTF(tamannoDeMatriz);
+            System.out.println(numeroDeJugadorEnviadoPorServer);///////////////////////////////////////////////////////////////////
+            this.playerNumber = Integer.parseInt(numeroDeJugadorEnviadoPorServer);
+            this.myTurn = this.playerNumber == 1;
+            if (this.playerNumber == 1) {
+                this.matrixSize = this.cbxType.getValue();
+                dos.writeUTF(this.matrixSize);
             } else {
-                // recibo tamanno
 //                btnLaunch.setDisable(true);
-                tamannoDeMatriz = dis.readUTF();
+                this.matrixSize = dis.readUTF();
             }
             dos.close();
             dis.close();
@@ -443,20 +437,19 @@ public class Window extends Application {
     } // sendName
 
     public void sendMessage() {
-        chat.setStyle("-fx-text-inner-color: blue;");
-        String message = namePlayer + ":" + tfdMessage.getText() + "\n";
-        chat.appendText(message);
+        this.chat.setStyle("-fx-text-inner-color: blue;");
+        String message = this.namePlayer + ":" + this.tfdMessage.getText() + "\n";
+        this.chat.appendText(message);
         try {
             Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
             DataOutputStream dat = new DataOutputStream(socket.getOutputStream());
-            dat.writeUTF("chat&" + playerNumber + "&" + tfdMessage.getText());
+            dat.writeUTF("chat&" + this.playerNumber + "&" + this.tfdMessage.getText());
             dat.close();
             socket.close();
         } catch (IOException ex) {
             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
         }
-        tfdMessage.clear();
-
+        this.tfdMessage.clear();
     } // sendMessage
 
     public static void main(String[] args) {
@@ -465,18 +458,18 @@ public class Window extends Application {
 
     private void drawGrid(GraphicsContext gcM) {
         if (this.playerNumber == 1) {
-            for (int i = 0; i <= rc; i++) {
-                gcM.strokeLine(0, i * this.size, rc * this.size, i * this.size); // rows
+            for (int i = 0; i <= this.rc; i++) {
+                gcM.strokeLine(0, i * this.size, this.rc * this.size, i * this.size); // rows
             } // for x
             for (int j = 0; j <= rc; j++) {
-                gcM.strokeLine(j * this.size, 0, j * this.size, this.size * rc); // cols
+                gcM.strokeLine(j * this.size, 0, j * this.size, this.size * this.rc); // cols
             } // for y
         } else {
-            for (int i = 0; i <= rc; i++) {
-                gcM.strokeLine(0, i * this.size, rc * this.size, i * this.size); // rows
+            for (int i = 0; i <= this.rc; i++) {
+                gcM.strokeLine(0, i * this.size, this.rc * this.size, i * this.size); // rows
             } // for x
-            for (int j = 0; j <= rc; j++) {
-                gcM.strokeLine(j * this.size, 0, j * this.size, this.size * rc); // cols
+            for (int j = 0; j <= this.rc; j++) {
+                gcM.strokeLine(j * this.size, 0, j * this.size, this.size * this.rc); // cols
             } // for y
         }
     } // drawGrid: dibuja las lineas del mosaico
@@ -504,51 +497,49 @@ public class Window extends Application {
     public void setSpaceShip(double yClick, double xClick, int type) {
         double xMouse = xClick;
         double yMouse = yClick;
-        for (int i = 0; i < rc; i++) {
-            for (int j = 0; j < rc; j++) {
-                if ((xMouse >= i * size && xMouse <= i * size + size)
-                        && (yMouse >= j * size && yMouse <= j * size + size)) {
+        for (int i = 0; i < this.rc; i++) {
+            for (int j = 0; j < this.rc; j++) {
+                if ((xMouse >= i * this.size && xMouse <= i * this.size + this.size)
+                        && (yMouse >= j * this.size && yMouse <= j * this.size + this.size)) {
                     if (type == 1) {
-
-                        if (mCont > 0) {
-                            mother = new SpaceShip(i, j, size, 2, 1, playerNumber);
-                            spaceShips.add(mother);
-                            mCont--;
+                        if (this.mCont > 0) {
+                            this.mother = new SpaceShip(i, j, this.size, 2, 1, this.playerNumber);
+                            this.spaceShips.add(this.mother);
+                            this.mCont--;
                         }
                     } else {
-                        if (minions > 0) {
-                            spaceShips.add(new SpaceShip(i, j, size, 1, 2, playerNumber));
-                            minions--;
+                        if (this.minions > 0) {
+                            this.spaceShips.add(new SpaceShip(i, j, this.size, 1, 2, this.playerNumber));
+                            this.minions--;
                         }
                     }
-                    if (playerNumber == 1) {
-                        draw(gc1);
+                    if (this.playerNumber == 1) {
+                        draw(this.gc1);
                     } else {
-                        draw(gc2);
+                        draw(this.gc2);
                     }
-                }
-            }
-        }
+                } // if
+            } // for j
+        } // for i
     } // setSpaceShip
 
     public void deleteSpaceShip(double yClick, double xClick) {
-        for (int i = 0; i < spaceShips.size(); i++) {
-            int x = spaceShips.get(i).getX() * size;
-            int y = spaceShips.get(i).getY() * size;
-            if ((xClick >= x && xClick <= x + size)
-                    && (yClick >= y && yClick <= y + size)) {
-                if (spaceShips.get(i).getType() == 1) {
-                    mCont++;
-                    spaceShips.remove(i);
+        for (int i = 0; i < this.spaceShips.size(); i++) {
+            int x = this.spaceShips.get(i).getX() * this.size;
+            int y = this.spaceShips.get(i).getY() * this.size;
+            if ((xClick >= x && xClick <= x + this.size)
+                    && (yClick >= y && yClick <= y + this.size)) {
+                if (this.spaceShips.get(i).getType() == 1) {
+                    this.mCont++;
+                    this.spaceShips.remove(i);
                 } else {
-                    minions++;
-                    spaceShips.remove(i);
-
+                    this.minions++;
+                    this.spaceShips.remove(i);
                 }
-                if (playerNumber == 1) {
-                    draw(gc1);
+                if (this.playerNumber == 1) {
+                    draw(this.gc1);
                 } else {
-                    draw(gc2);
+                    draw(this.gc2);
                 }
                 break;
             }
@@ -558,51 +549,50 @@ public class Window extends Application {
     private void selectEnemyPosition(double x, double y) {
         double xMouse = x;
         double yMouse = y;
-        for (int i = 0; i < rc; i++) {
-            for (int j = 0; j < rc; j++) {
-                if ((xMouse >= i * size && xMouse <= i * size + size)
-                        && (yMouse >= j * size && yMouse <= j * size + size)) {
-                    xO = i;
-                    yO = j;
-                    System.out.println(xO + " " + yO);
+        for (int i = 0; i < this.rc; i++) {
+            for (int j = 0; j < this.rc; j++) {
+                if ((xMouse >= i * this.size && xMouse <= i * this.size + this.size)
+                        && (yMouse >= j * this.size && yMouse <= j * this.size + this.size)) {
+                    this.xO = i;
+                    this.yO = j;
+                    System.out.println(xO + " " + yO);/////////////////////////////////////////////////////////////////
                 }
             }
         }
     } // selectEnemyPosition
 
     public void isImpact() {
-        for (int i = 0; i < spaceShips.size(); i++) {
-            int xe = spaceShips.get(i).getX() * size;
-            int ye = spaceShips.get(i).getY() * size;
-            if ((missile.getxI() + (size / 2) >= xe && missile.getxI() + (size / 2) <= xe + size)
-                    && (missile.getyI() + (size / 2) >= ye && missile.getyI() + (size / 2) <= ye + size)) {
-                spaceShips.get(i).impact();
-                if (spaceShips.get(i).getType() == 1) {
-                    if (tamannoDeMatriz.equals("3X3")) {
-                        enemyScore += 250;
+        for (int i = 0; i < this.spaceShips.size(); i++) {
+            int xe = this.spaceShips.get(i).getX() * this.size;
+            int ye = this.spaceShips.get(i).getY() * this.size;
+            if ((this.missile.getxI() + (this.size / 2) >= xe && this.missile.getxI() + (this.size / 2) <= xe + this.size)
+                    && (this.missile.getyI() + (this.size / 2) >= ye && this.missile.getyI() + (this.size / 2) <= ye + this.size)) {
+                this.spaceShips.get(i).impact();
+                if (this.spaceShips.get(i).getType() == 1) {
+                    if (this.matrixSize.equals("3X3")) {
+                        this.enemyScore += 250;
                     } else {
-                        enemyScore += 500;
+                        this.enemyScore += 500;
                     }
                 } else {
-                    enemyScore += 250;
+                    this.enemyScore += 250;
                 }
-                if (spaceShips.get(i).getLife() == 0) {
-                    spaceShips.get(i).start();
-                    while (spaceShips.get(i).getImageCount() < 9) {
+                if (this.spaceShips.get(i).getLife() == 0) {
+                    this.spaceShips.get(i).start();
+                    while (this.spaceShips.get(i).getImageCount() < 9) {
                         try {
                             auxDraw();
                             Thread.sleep(50);
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(Window.class
-                                    .getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     } // while
-                    if (spaceShips.get(i).getType() == 1) {
+                    if (this.spaceShips.get(i).getType() == 1) {
                         try {
-                            spaceShips.remove(i);
+                            this.spaceShips.remove(i);
                             Socket endSocket = new Socket(Constants.address, Constants.socketPortNumber);
                             DataOutputStream dat = new DataOutputStream(endSocket.getOutputStream());
-                            dat.writeUTF("end&" + playerNumber);
+                            dat.writeUTF("end&" + this.playerNumber);
                             dat.close();
                             endSocket.close();
                             //score();
@@ -611,20 +601,19 @@ public class Window extends Application {
                         }
                         score();
                     } else {
-                        spaceShips.remove(i);
+                        this.spaceShips.remove(i);
                     }
                 } // if (spaceShips.get(i).getLife() == 0)
                 break;
             } // if ((missile.getxI() >= xe && missile.getxI() <= xe + ...
         } // for (int i = 0; i < spaceShips.size(); i++)
-
     } // isImpact
 
     private void score() {
         try {
             Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
             DataOutputStream send = new DataOutputStream(socket.getOutputStream());
-            send.writeUTF("score&"+playerNumber+"&"+enemyScore);
+            send.writeUTF("score&" + this.playerNumber + "&" + this.enemyScore);
             send.close();
             socket.close();
         } catch (IOException ex) {
@@ -633,12 +622,12 @@ public class Window extends Application {
     } // score
 
     public void initTable() {
-        scoreTable = new TableView<>();
+        this.scoreTable = new TableView<>();
         TableColumn tcName = new TableColumn("Name");
         TableColumn tcScore = new TableColumn("Score");
         tcName.setCellValueFactory(new PropertyValueFactory<>("name"));
         tcScore.setCellValueFactory(new PropertyValueFactory<>("score"));
-        scoreTable.getColumns().addAll(tcName, tcScore);
+        this.scoreTable.getColumns().addAll(tcName, tcScore);
         try {
             Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
             DataOutputStream send = new DataOutputStream(socket.getOutputStream());
@@ -646,7 +635,7 @@ public class Window extends Application {
             ObjectInputStream dat = new ObjectInputStream(socket.getInputStream());
             try {
                 ObservableList<Score> scoreList = FXCollections.observableArrayList((List<Score>) dat.readObject());
-                scoreTable.setItems(scoreList);
+                this.scoreTable.setItems(scoreList);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -656,13 +645,12 @@ public class Window extends Application {
         } catch (IOException ex) {
             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Pane tablePane=new Pane(scoreTable);
-        Stage tableStage=new Stage();
-        Scene scene1=new Scene(tablePane);
+        Pane tablePane = new Pane(this.scoreTable);
+        Stage tableStage = new Stage();
+        Scene scene1 = new Scene(tablePane);
         tableStage.setScene(scene1);
         tableStage.setAlwaysOnTop(true);
         tableStage.show();
-        
-    }
+    } // initTable
 
 } // end class

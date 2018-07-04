@@ -42,18 +42,18 @@ public class SpaceShip extends Thread {
         return this.life;
     } // getLife
 
-    public void chargeSprites() {
+    private void chargeSprites() {
         for (int i = 0; i < 9; i++) {
             if (this.player == 1) {
                 if (this.type == 1) {
                     this.sprites.add(new Image("/assets/mE" + i + ".png"));
-                }else{
+                } else {
                     this.sprites.add(new Image("/assets/pn" + i + ".png"));
                 }
             } else {
                 if (this.type == 1) {
                     this.sprites.add(new Image("/assets/mED" + i + ".png"));
-                }else{
+                } else {
                     this.sprites.add(new Image("/assets/n" + i + ".png"));
                 }
             }
@@ -70,7 +70,7 @@ public class SpaceShip extends Thread {
 
     @Override
     public void run() {
-        while (this.imageCount<9) {
+        while (this.imageCount < 9) {
             try {
                 this.imageCount++;
                 Thread.sleep(200);
@@ -83,5 +83,5 @@ public class SpaceShip extends Thread {
     public void draw(GraphicsContext gc) {
         gc.drawImage(this.sprites.get(imageCount), x * size, y * size, size, size);
     } // draw
-    
+
 } // end class
