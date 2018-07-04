@@ -365,6 +365,7 @@ public class Window extends Application {
                 motherActive = false;
                 minionActive = !minionActive;
             } else if (event.getSource() == btnSetFinish) {
+                messageArea.setText("");
                 bottonPane.getChildren().clear();
                 bottonPane.getChildren().addAll(btnLaunch, messageArea);
             } else {
