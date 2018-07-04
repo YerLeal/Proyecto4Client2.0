@@ -75,7 +75,12 @@ public class Window extends Application {
                     chatConnection = chatServer.accept();
                     DataInputStream recieve = new DataInputStream(chatConnection.getInputStream());
                     chatArea.setStyle("-fx-text-inner-color: red;");
-                    chatArea.appendText(recieve.readUTF() + "\n");
+                    String aux[] = recieve.readUTF().split("&");
+                    if (aux[0].equals("chat")) {
+                        chatArea.appendText(aux[1] + "\n");
+                    } else {
+                        messageArea.appendText(aux[1] + "\n");
+                    }
                     recieve.close();
                     chatConnection.close();
                 }
@@ -336,7 +341,7 @@ public class Window extends Application {
                 if (cbxType.getValue() != null && !tfdName.getText().equals("")) {
                     sendName();
                     bottonPane.getChildren().clear();
-                    bottonPane.getChildren().addAll(btnSetMother, btnSetMinions, btnSetFinish);
+                    bottonPane.getChildren().addAll(btnSetMother, btnSetMinions, btnSetFinish, messageArea);
                     if (matrixSize.equals("3X3")) {
                         rc = 3;
                         minions = 2;
@@ -361,7 +366,7 @@ public class Window extends Application {
                 minionActive = !minionActive;
             } else if (event.getSource() == btnSetFinish) {
                 bottonPane.getChildren().clear();
-                bottonPane.getChildren().addAll(btnLaunch);
+                bottonPane.getChildren().addAll(btnLaunch, messageArea);
             } else {
                 initTable();
             }
@@ -576,7 +581,7 @@ public class Window extends Application {
             if ((this.missile.getxI() + (this.size / 2) >= xe && this.missile.getxI() + (this.size / 2) <= xe + this.size)
                     && (this.missile.getyI() + (this.size / 2) >= ye && this.missile.getyI() + (this.size / 2) <= ye + this.size)) {
                 this.spaceShips.get(i).impact();
-                this.messageArea.appendText("Impact\n");
+                sendMessageShot("Impact");
                 if (this.spaceShips.get(i).getType() == 1) {
                     if (this.matrixSize.equals("3X3")) {
                         this.enemyScore += 250;
@@ -616,7 +621,7 @@ public class Window extends Application {
                 break;
             } // if ((missile.getxI() >= xe && missile.getxI() <= xe + ...
             if (i == this.spaceShips.size() - 1) {
-                this.messageArea.appendText("Loss\n");
+                sendMessageShot("Miss");
             }
         } // for (int i = 0; i < spaceShips.size(); i++)
     } // isImpact
@@ -664,5 +669,17 @@ public class Window extends Application {
         tableStage.setAlwaysOnTop(true);
         tableStage.show();
     } // initTable
+
+    private void sendMessageShot(String message) {
+        try {
+            Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
+            DataOutputStream dat = new DataOutputStream(socket.getOutputStream());
+            dat.writeUTF("shot&" + message + "\n");
+            dat.close();
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    } // sendMessageShot
 
 } // end class
