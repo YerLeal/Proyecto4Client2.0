@@ -439,7 +439,7 @@ public class Window extends Application {
                 this.matrixSize = this.cbxType.getValue();
                 dos.writeUTF(this.matrixSize);
             } else {
-//                btnLaunch.setDisable(true);
+                this.btnLaunch.setDisable(true);
                 this.matrixSize = dis.readUTF();
             }
             dos.close();
