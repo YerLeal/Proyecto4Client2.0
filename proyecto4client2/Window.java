@@ -58,7 +58,7 @@ public class Window extends Application {
     private ArrayList<SpaceShip> spaceShips;
     private int x, y, xO, yO, mCont = 1, playerNumber = -1, size = 150, rc, minions, difference;
     private Label lbName;
-    private TextArea chat;
+    private TextArea chatArea, messageArea;
     private TextField tfdName, tfdMessage;
     private String namePlayer, matrixSize = "";
     private int enemyScore = 0;
@@ -74,8 +74,8 @@ public class Window extends Application {
                 while (true) {
                     chatConnection = chatServer.accept();
                     DataInputStream recieve = new DataInputStream(chatConnection.getInputStream());
-                    chat.setStyle("-fx-text-inner-color: red;");
-                    chat.appendText(recieve.readUTF() + "\n");
+                    chatArea.setStyle("-fx-text-inner-color: red;");
+                    chatArea.appendText(recieve.readUTF() + "\n");
                     recieve.close();
                     chatConnection.close();
                 }
@@ -233,8 +233,10 @@ public class Window extends Application {
         //textField-Area
         this.tfdName = new TextField();
         this.tfdMessage = new TextField();
-        this.chat = new TextArea();
-        this.chat.setEditable(false);
+        this.chatArea = new TextArea();
+        this.chatArea.setEditable(false);
+        this.messageArea = new TextArea();
+        this.messageArea.setEditable(false);
 
         //Pane-Canvas
         this.canvasBox = new HBox();
@@ -261,8 +263,10 @@ public class Window extends Application {
         //size and relocated
         this.btnLaunch.setPrefSize(100, 50);
         chatPane.setPrefSize(450, 700);
-        this.chat.relocate(75, 0);
-        this.chat.setPrefSize(300, 450);
+        this.chatArea.relocate(75, 0);
+        this.chatArea.setPrefSize(300, 450);
+        this.messageArea.relocate(400, 30);
+        this.messageArea.setPrefSize(300, 30);
         this.tfdMessage.relocate(120, 480);
         this.btnSendMessage.relocate(300, 480);
         this.bottonPane.setPrefSize(500, 200);
@@ -283,9 +287,9 @@ public class Window extends Application {
         this.cbxType.relocate(10, 50);
 
         //add
-        chatPane.getChildren().addAll(this.chat, this.btnSendMessage, this.tfdMessage, this.btnScore);
+        chatPane.getChildren().addAll(this.chatArea, this.btnSendMessage, this.tfdMessage, this.btnScore);
         this.canvasBox.getChildren().addAll(this.canvasPlayer1, this.canvasPlayer2);
-        this.bottonPane.getChildren().addAll(this.lbName, this.tfdName, this.btnSendName, this.cbxType);
+        this.bottonPane.getChildren().addAll(this.messageArea, this.lbName, this.tfdName, this.btnSendName, this.cbxType);
 
         this.canvasBox.relocate(0, 0);
         this.bottonPane.relocate(0, 450);
@@ -348,7 +352,7 @@ public class Window extends Application {
                     drawGrid(gc1);
                     drawGrid(gc2);
                 } else {
-                    chat.appendText("Missing data\n");
+                    messageArea.setText("Missing data");
                 }
             } else if (event.getSource() == btnSendMessage) {
                 sendMessage(namePlayer + ":" + tfdMessage.getText() + "\n");
@@ -442,8 +446,8 @@ public class Window extends Application {
     } // sendName
 
     public void sendMessage(String message) {
-        this.chat.setStyle("-fx-text-inner-color: blue;");
-        this.chat.appendText(message);
+        this.chatArea.setStyle("-fx-text-inner-color: blue;");
+        this.chatArea.appendText(message);
         try {
             Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
             DataOutputStream dat = new DataOutputStream(socket.getOutputStream());
@@ -572,7 +576,7 @@ public class Window extends Application {
             if ((this.missile.getxI() + (this.size / 2) >= xe && this.missile.getxI() + (this.size / 2) <= xe + this.size)
                     && (this.missile.getyI() + (this.size / 2) >= ye && this.missile.getyI() + (this.size / 2) <= ye + this.size)) {
                 this.spaceShips.get(i).impact();
-                sendMessage("Impact\n");
+                this.messageArea.appendText("Impact\n");
                 if (this.spaceShips.get(i).getType() == 1) {
                     if (this.matrixSize.equals("3X3")) {
                         this.enemyScore += 250;
@@ -612,7 +616,7 @@ public class Window extends Application {
                 break;
             } // if ((missile.getxI() >= xe && missile.getxI() <= xe + ...
             if (i == this.spaceShips.size() - 1) {
-                sendMessage("loss\n");
+                this.messageArea.appendText("Loss\n");
             }
         } // for (int i = 0; i < spaceShips.size(); i++)
     } // isImpact
