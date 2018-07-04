@@ -219,7 +219,7 @@ public class Window extends Application {
     private void initComponents(Stage primaryStage) {
         this.backGroundCanvas = new Canvas(WIDTH, HEIGHT);
         this.backGroundCanvas.getGraphicsContext2D().drawImage(new Image("assets/background.jpg"), 0, 0, WIDTH, HEIGHT);
-        
+
         //Labels
         this.lbName = new Label("Name: ");
         //buttons
@@ -234,8 +234,9 @@ public class Window extends Application {
         this.tfdName = new TextField();
         this.tfdMessage = new TextField();
         this.chat = new TextArea();
+        this.chat.setEditable(false);
 
-        //Panes-Canvas
+        //Pane-Canvas
         this.canvasBox = new HBox();
         this.principalPane = new Pane();
         this.canvasPlayer1 = new Canvas(450, 450);
@@ -328,25 +329,29 @@ public class Window extends Application {
                 motherActive = !motherActive;
                 minionActive = false;
             } else if (event.getSource() == btnSendName) {
-                sendName();
-                bottonPane.getChildren().clear();
-                bottonPane.getChildren().addAll(btnSetMother, btnSetMinions, btnSetFinish);
-                if (matrixSize.equals("3X3")) {
-                    rc = 3;
-                    minions = 2;
-                    size = 150;
-                    difference = 50;
+                if (cbxType.getValue() != null && !tfdName.getText().equals("")) {
+                    sendName();
+                    bottonPane.getChildren().clear();
+                    bottonPane.getChildren().addAll(btnSetMother, btnSetMinions, btnSetFinish);
+                    if (matrixSize.equals("3X3")) {
+                        rc = 3;
+                        minions = 2;
+                        size = 150;
+                        difference = 50;
+                    } else {
+                        rc = 5;
+                        size = 90;
+                        difference = 25;
+                        minions = 4;
+                    }
+                    fillPositions();
+                    drawGrid(gc1);
+                    drawGrid(gc2);
                 } else {
-                    rc = 5;
-                    size = 90;
-                    difference = 25;
-                    minions = 4;
+                    chat.appendText("Missing data\n");
                 }
-                fillPositions();
-                drawGrid(gc1);
-                drawGrid(gc2);
             } else if (event.getSource() == btnSendMessage) {
-                sendMessage();
+                sendMessage(namePlayer + ":" + tfdMessage.getText() + "\n");
             } else if (event.getSource() == btnSetMinions) {
                 motherActive = false;
                 minionActive = !minionActive;
@@ -436,9 +441,8 @@ public class Window extends Application {
         }
     } // sendName
 
-    public void sendMessage() {
+    public void sendMessage(String message) {
         this.chat.setStyle("-fx-text-inner-color: blue;");
-        String message = this.namePlayer + ":" + this.tfdMessage.getText() + "\n";
         this.chat.appendText(message);
         try {
             Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
@@ -568,6 +572,7 @@ public class Window extends Application {
             if ((this.missile.getxI() + (this.size / 2) >= xe && this.missile.getxI() + (this.size / 2) <= xe + this.size)
                     && (this.missile.getyI() + (this.size / 2) >= ye && this.missile.getyI() + (this.size / 2) <= ye + this.size)) {
                 this.spaceShips.get(i).impact();
+                sendMessage("Impact\n");
                 if (this.spaceShips.get(i).getType() == 1) {
                     if (this.matrixSize.equals("3X3")) {
                         this.enemyScore += 250;
@@ -606,6 +611,9 @@ public class Window extends Application {
                 } // if (spaceShips.get(i).getLife() == 0)
                 break;
             } // if ((missile.getxI() >= xe && missile.getxI() <= xe + ...
+            if (i == this.spaceShips.size() - 1) {
+                sendMessage("loss\n");
+            }
         } // for (int i = 0; i < spaceShips.size(); i++)
     } // isImpact
 
