@@ -674,7 +674,7 @@ public class Window extends Application {
         try {
             Socket socket = new Socket(Constants.address, Constants.socketPortNumber);
             DataOutputStream dat = new DataOutputStream(socket.getOutputStream());
-            dat.writeUTF("shot&" + message + "\n");
+            dat.writeUTF("shot&" + this.playerNumber + "&" + message + "\n");
             dat.close();
             socket.close();
         } catch (IOException ex) {
